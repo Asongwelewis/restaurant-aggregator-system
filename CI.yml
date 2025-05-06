@@ -1,0 +1,26 @@
+name: CI Pipeline
+
+on: [push, pull_request]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - run: pip install -r src/backend/requirements.txt
+      - run: cd src/backend && python manage.py test
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: cd src/frontend && npm install
+      - run: cd src/frontend && npm test
