@@ -1,0 +1,149 @@
+classDiagram
+    %% Main Entities
+    class User {
+        +userId: String
+        +name: String
+        +email: String
+        +phone: String
+        +location: Address
+        +verifyIdentity()
+    }
+
+    class Guest {
+        +temporaryId: String
+        +checkoutAsGuest()
+    }
+
+    class RegisteredUser {
+        +password: String
+        +dietaryPreferences: String[]
+        +favorites: Restaurant[]
+        +bookTable()
+        +rateRestaurant()
+    }
+
+    class PremiumUser {
+        +subscriptionType: String
+        +expiryDate: Date
+        +shareWishlist()
+        +getExclusiveOffers()
+    }
+
+    class RestaurantOwner {
+        +taxId: String
+        +subscriptionStatus: Boolean
+        +updateMenu()
+        +createAdCampaign()
+        +viewAnalytics()
+    }
+
+    class Admin {
+        +adminLevel: String
+        +manageAccounts()
+        +moderateContent()
+        +configureSystem()
+    }
+
+    class Restaurant {
+        +restaurantId: String
+        +name: String
+        +cuisineType: String
+        +rating: Float
+        +operatingHours: String
+        +menu: MenuItem[]
+        +location: Address
+    }
+
+    class MenuItem {
+        +itemId: String
+        +name: String
+        +description: String
+        +price: Float
+        +dietaryInfo: String
+        +isAvailable: Boolean
+    }
+
+    class Booking {
+        +bookingId: String
+        +dateTime: DateTime
+        +partySize: Integer
+        +status: String
+        +paymentMethod: String
+        +generateQRCode()
+    }
+
+    class Review {
+        +reviewId: String
+        +rating: Integer
+        +comment: String
+        +photos: Image[]
+        +timestamp: DateTime
+    }
+
+    class AdCampaign {
+        +campaignId: String
+        +budget: Float
+        +targetRadius: Integer
+        +duration: Integer
+        +metrics: CampaignMetrics
+    }
+
+    class PaymentSystem {
+        +processPayment()
+        +refundPayment()
+        +validateCard()
+    }
+
+    class Delivery {
+        +deliveryId: String
+        +status: String
+        +eta: DateTime
+        +trackLocation()
+    }
+
+    %% Relationships
+    User <|-- Guest
+    User <|-- RegisteredUser
+    RegisteredUser <|-- PremiumUser
+    User <|-- RestaurantOwner
+    User <|-- Admin
+
+    User "1" --> "*" Booking
+    Restaurant "1" --> "*" Booking
+    Restaurant "1" --> "*" MenuItem
+    Restaurant "1" --> "*" Review
+    RestaurantOwner "1" --> "*" Restaurant
+    RestaurantOwner "1" --> "*" AdCampaign
+
+    RegisteredUser "1" --> "*" Review
+    Booking "1" --> "1" PaymentSystem
+    Booking "0..1" --> "1" Delivery
+
+    Admin "1" --> "*" Restaurant : verifies
+    Admin "1" --> "*" User : manages
+
+    %% Utility Classes
+    class Address {
+        +street: String
+        +city: String
+        +state: String
+        +zipCode: String
+        +coordinates: GeoPoint
+    }
+
+    class CampaignMetrics {
+        +impressions: Integer
+        +clicks: Integer
+        +conversions: Integer
+    }
+
+    class SystemHealth {
+        +uptime: Float
+        +errorLogs: String[]
+        +generateReport()
+    }
+
+    Restaurant "1" --> "1" Address
+    User "1" --> "1" Address
+    AdCampaign "1" --> "1" CampaignMetrics
+    Admin "1" --> "1" SystemHealth
