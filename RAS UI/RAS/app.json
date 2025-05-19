@@ -1,0 +1,10 @@
+{
+  "expo": {
+    "name": "RAS",
+    "slug": "RAS",
+    "version": "1.0.0",
+    "android": {
+      "package": "com.anonymous.RAS"
+    }
+  }
+}
