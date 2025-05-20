@@ -1,0 +1,72 @@
+.welcome-bg {
+  position: relative;
+  width: 100vw;
+  height: 100vh;
+  background: #fff;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.circles {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.circle {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.3;
+  animation: moveCircle 3s linear infinite;
+}
+
+.c1 {
+  width: 200px;
+  height: 200px;
+  background: #27ae60;
+  top: 10%;
+  left: 20%;
+  animation-delay: 0s;
+}
+
+.c2 {
+  width: 300px;
+  height: 300px;
+  background: #2ecc40;
+  top: 50%;
+  left: 60%;
+  animation-delay: 0.5s;
+}
+
+.c3 {
+  width: 150px;
+  height: 150px;
+  background: #16a085;
+  top: 70%;
+  left: 10%;
+  animation-delay: 1s;
+}
+
+@keyframes moveCircle {
+  0% { transform: scale(1) translateY(0); }
+  50% { transform: scale(1.2) translateY(-30px); }
+  100% { transform: scale(1) translateY(0); }
+}
+
+.resto-text {
+  position: relative;
+  z-index: 2;
+  font-size: 4rem;
+  color: #27ae60;
+  opacity: 0;
+  transition: opacity 1s;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.resto-text.show {
+  opacity: 1;
+}
