@@ -53,7 +53,7 @@ export default function SignupScreen({ navigation }) {
       <TouchableOpacity
         style={styles.guestButton}
         onPress={() => {
-          if (navigation) navigation.navigate('Welcome');
+          if (navigation) navigation.navigate('Home'); // Navigate to Home screen
         }}
       >
         <Ionicons name="person-outline" size={20} color="#27ae60" />
