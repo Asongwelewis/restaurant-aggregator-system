@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,14 +7,17 @@ import {
   TextInput,
   TouchableOpacity,
   Dimensions,
+  Image,
 } from 'react-native';
 import { Ionicons, FontAwesome, AntDesign } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
 
 const { width, height } = Dimensions.get('window');
 const BUBBLE_HEIGHT = height * 0.55;
 
 export default function SignupScreen({ navigation }) {
   const bubbleScale = useRef(new Animated.Value(0)).current;
+  const [image, setImage] = useState(null);
 
   useEffect(() => {
     Animated.spring(bubbleScale, {
@@ -24,13 +27,32 @@ export default function SignupScreen({ navigation }) {
     }).start();
   }, []);
 
+  const pickImage = async () => {
+    // Ask for permission
+    const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Sorry, we need camera roll permissions to make this work!');
+      return;
+    }
+    // Pick image
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: [ImagePicker.MediaType.IMAGE],
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.5,
+    });
+
+    if (!result.canceled) {
+      setImage(result.assets[0].uri);
+    }
+  };
+
   return (
     <View style={styles.container}>
       {/* Sign in as Guest */}
       <TouchableOpacity
         style={styles.guestButton}
         onPress={() => {
-          // Handle guest sign in here
           if (navigation) navigation.navigate('Welcome');
         }}
       >
@@ -48,9 +70,17 @@ export default function SignupScreen({ navigation }) {
         ]}
       >
         {/* Avatar */}
-        <View style={styles.avatarContainer}>
-          <Ionicons name="person-add" size={90} color="#fff" />
-        </View>
+        <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
+          {image ? (
+            <Image
+              source={{ uri: image }}
+              style={styles.avatarImage}
+            />
+          ) : (
+            <Ionicons name="person-add" size={90} color="#fff" />
+          )}
+          <Text style={styles.avatarHint}>Tap to add photo</Text>
+        </TouchableOpacity>
         {/* Signup Fields */}
         <View style={styles.inputContainer}>
           <TextInput
@@ -142,8 +172,23 @@ const styles = StyleSheet.create({
     zIndex: 2,
   },
   avatarContainer: {
-    marginBottom: 20,
+    marginBottom: 10,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  avatarImage: {
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    borderWidth: 2,
+    borderColor: '#fff',
+    backgroundColor: '#c8f7dc',
+  },
+  avatarHint: {
+    color: '#fff',
+    fontSize: 13,
+    marginTop: 4,
+    opacity: 0.8,
   },
   inputContainer: {
     width: '80%',

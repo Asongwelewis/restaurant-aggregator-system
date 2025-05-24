@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -15,6 +15,8 @@ const { width, height } = Dimensions.get('window');
 
 export default function LoginScreen({ navigation }) {
   const bubbleScale = useRef(new Animated.Value(0)).current;
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
 
   useEffect(() => {
     Animated.spring(bubbleScale, {
@@ -23,6 +25,8 @@ export default function LoginScreen({ navigation }) {
       useNativeDriver: true,
     }).start();
   }, []);
+
+  const isLoginDisabled = !username || !password;
 
   return (
     <View style={styles.container}>
@@ -45,13 +49,35 @@ export default function LoginScreen({ navigation }) {
             style={styles.input}
             placeholder="Enter your username or number"
             placeholderTextColor="#eafaf1"
+            value={username}
+            onChangeText={setUsername}
           />
           <TextInput
             style={styles.input}
             placeholder="Enter your password"
             placeholderTextColor="#eafaf1"
             secureTextEntry
+            value={password}
+            onChangeText={setPassword}
           />
+          {/* Login Button */}
+          <TouchableOpacity
+            style={[
+              styles.loginButton,
+              isLoginDisabled && { backgroundColor: '#b7e0c6', borderColor: '#b7e0c6' },
+            ]}
+            onPress={() => {
+              // Handle login logic here
+            }}
+            disabled={isLoginDisabled}
+          >
+            <Text style={[
+              styles.loginButtonText,
+              isLoginDisabled && { color: '#fff' }
+            ]}>
+              Login
+            </Text>
+          </TouchableOpacity>
         </View>
       </Animated.View>
 
@@ -160,5 +186,20 @@ const styles = StyleSheet.create({
     elevation: 2,
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  loginButton: {
+    backgroundColor: '#27ae60',
+    paddingVertical: 14,
+    borderRadius: 25,
+    marginVertical: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#27ae60',
+  },
+  loginButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
 });
