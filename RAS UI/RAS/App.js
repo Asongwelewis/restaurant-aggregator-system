@@ -2,14 +2,8 @@ import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import WelcomeScreen from './WelcomeScreen';
-
-// Dummy Login and Signup screens for demonstration
-function LoginScreen() {
-  return null; // Replace with your login UI
-}
-function SignupScreen() {
-  return null; // Replace with your signup UI
-}
+import LoginScreen from './LoginScreen';
+import SignupScreen from './SignupScreen';
 
 const Stack = createStackNavigator();
 
