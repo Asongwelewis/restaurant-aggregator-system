@@ -11,6 +11,7 @@ import ReservationsScreen from './ReservationsScreen';
 import MarketplaceScreen from './MarketplaceScreen';
 import ProfileScreen from './ProfileScreen';
 import MapScreen from './MapScreen';
+import ReservationsScreen from './ReservationsScreen';
 import { Ionicons, FontAwesome5, MaterialIcons, Entypo } from '@expo/vector-icons';
 
 const Stack = createStackNavigator();
@@ -51,6 +52,7 @@ export default function App() {
         <Stack.Screen name="Signup" component={SignupScreen} />
         <Stack.Screen name="Home" component={MainTabs} />
         <Stack.Screen name="PostDetail" component={PostDetailScreen} />
+        <Stack.Screen name="Reservations" component={ReservationsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
