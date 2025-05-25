@@ -11,6 +11,8 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import RestaurantProfileScreen from './RestaurantProfileScreen'; // Make sure this exists
+import UserProfileScreen from './UserProfileScreen'; // You will create this below
 
 // Sample restaurant lists for horizontal scroll
 const restaurantLists = [
@@ -203,15 +205,21 @@ export default function HomeScreen({ navigation }) {
         keyExtractor={item => item.id}
         showsHorizontalScrollIndicator={false}
         renderItem={({ item }) => (
-          <View style={styles.restaurantCard}>
-            <Image source={{ uri: item.image }} style={styles.restaurantImage} />
-            <View style={styles.restaurantProfileRow}>
-              <Image source={{ uri: item.profilePic }} style={styles.restaurantProfilePic} />
-              <Text style={styles.restaurantName}>{item.name}</Text>
+          <TouchableOpacity
+            onPress={() =>
+              navigation.navigate('RestaurantProfile', { restaurant: item })
+            }
+          >
+            <View style={styles.restaurantCard}>
+              <Image source={{ uri: item.image }} style={styles.restaurantImage} />
+              <View style={styles.restaurantProfileRow}>
+                <Image source={{ uri: item.profilePic }} style={styles.restaurantProfilePic} />
+                <Text style={styles.restaurantName}>{item.name}</Text>
+              </View>
+              <Text style={styles.restaurantLocation}>{item.location}</Text>
+              {renderStars(item.stars)}
             </View>
-            <Text style={styles.restaurantLocation}>{item.location}</Text>
-            {renderStars(item.stars)}
-          </View>
+          </TouchableOpacity>
         )}
       />
     </View>
@@ -225,18 +233,44 @@ export default function HomeScreen({ navigation }) {
     return (
       <View style={styles.post}>
         {/* Profile info */}
-        <View style={styles.profileRow}>
+        <TouchableOpacity
+          style={styles.profileRow}
+          onPress={() =>
+            navigation.navigate('UserProfile', {
+              user: {
+                profilePic: item.profilePic,
+                profileName: item.profileName,
+                intro: item.intro,
+              },
+            })
+          }
+        >
           <Image source={{ uri: item.profilePic }} style={styles.profilePic} />
           <View>
             <Text style={styles.profileName}>{item.profileName}</Text>
             <Text style={styles.profileIntro}>{item.intro}</Text>
           </View>
-        </View>
+        </TouchableOpacity>
         {/* Restaurant name */}
-        <View style={styles.postHeader}>
+        <TouchableOpacity
+          style={styles.postHeader}
+          onPress={() =>
+            navigation.navigate('RestaurantProfile', {
+              restaurant: {
+                name: item.restaurant,
+                image: item.image,
+                profilePic: item.profilePic,
+                location: item.location || 'Unknown',
+                stars: item.stars || 4,
+                reviews: item.comments?.length || 0,
+                likes: item.likes,
+              },
+            })
+          }
+        >
           <Ionicons name="restaurant" size={22} color="#27ae60" />
           <Text style={styles.restaurantName}>{item.restaurant}</Text>
-        </View>
+        </TouchableOpacity>
         {/* Post image */}
         <Image source={{ uri: item.image }} style={styles.postImage} />
         {/* Description */}
