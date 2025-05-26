@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException ,Request
 from pydantic import BaseModel, EmailStr
 from firebase_admin import auth 
 from firebase_admin import auth as firebase_auth
@@ -53,6 +53,24 @@ def guest_login():
 
 @router.post("/firebase-login")
 def firebase_login(request: Request):
+        # Extract token (remove "Bearer " if present)
+    id_token = request.headers.get("Authorization", "").replace("Bearer ", "")
+    if not id_token:
+        raise HTTPException(status_code=403, detail="Missing token")
+
+    try:
+        # Verify Firebase token
+        decoded_token = auth.verify_id_token(id_token)
+        user_data = {
+            "uid": decoded_token["uid"],
+            "role": decoded_token.get("role", "user"),
+        }
+        # Generate custom JWT
+        jwt_token = create_jwt_token(user_data)
+        return {"jwt": jwt_token, "message": "Login successful", "uid": user_data["uid"], "role": user_data.get("role", "user")}
+    except Exception as e:
+        raise HTTPException(status_code=403, detail=f"Invalid token: {str(e)}")
+
     user_data = verify_token_and_role(request)
     jwt_token = create_jwt_token({
         "uid": user_data["uid"],

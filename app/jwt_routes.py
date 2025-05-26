@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
-from app.jwt_auth import verify_jwt, create_jwt
+from app.jwt_auth import verify_jwt_token, create_jwt_token
 
 router = APIRouter()
 
 @router.get("/secure")
-def secure_endpoint(user_data=Depends(verify_jwt)):
+def secure_endpoint(user_data=Depends(verify_jwt_token)):
     return {"message": "Accessed with custom JWT", "data": user_data}
 
 @router.post("/generate-token")
@@ -13,9 +13,9 @@ def generate_token():
         "uid": "some-user-id",
         "role": "admin"
     }
-    token = create_jwt(payload)
+    token = create_jwt_token(payload)
     return {"token": token}
-    
+
 @router.get("/admin")
 def admin_protected(user=Depends(verify_jwt_token)):
     if user.get("role") != "admin":

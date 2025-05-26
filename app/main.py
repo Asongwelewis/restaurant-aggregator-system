@@ -5,8 +5,14 @@ from app.profile import router as profile_router
 from app.jwt_routes import router as jwt_router
 import os
 import uvicorn
+from dotenv import load_dotenv
+load_dotenv()
 
-app = FastAPI()
+app = FastAPI(
+    description ="Restaurant Aggregator System API",
+    title="Restaurant Aggregator System",
+    docs_url="/"
+)
 
 # Change directory to the specified path
 os.chdir(r"C:\Users\840 G5\Auth and user management\restaurant-aggregator-system")
