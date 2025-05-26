@@ -1,6 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel, EmailStr
-from firebase_admin import auth
+from firebase_admin import auth 
+from firebase_admin import auth as firebase_auth
+from app.jwt_auth import create_jwt_token
 from app.firebase_utils import *
 
 router = APIRouter()
@@ -48,3 +50,18 @@ def guest_login():
         return {"message": "Use Firebase Client SDK to log in anonymously and pass token"}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+@router.post("/firebase-login")
+def firebase_login(request: Request):
+    user_data = verify_token_and_role(request)
+    jwt_token = create_jwt_token({
+        "uid": user_data["uid"],
+        "role": user_data.get("role", "user"),
+        "auth_provider": "firebase"
+    })
+    return {
+        "message": "Login successful",
+        "uid": user_data["uid"],
+        "role": user_data.get("role", "user"),
+        "jwt": jwt_token
+    }

@@ -23,7 +23,7 @@ def verify_jwt(request: Request):
     token = request.headers.get("Authorization")
     if not token:
         raise HTTPException(status_code=403, detail="Missing Authorization token")
-
+        
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
