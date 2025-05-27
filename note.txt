@@ -1,1 +1,9 @@
 http://localhost:3000/
+fastapi==0.95.2
+firebase-admin==6.1.0
+google-cloud-firestore==2.11.1
+uvicorn==0.22.0
+pydantic==1.10.7
+python-dotenv==1.0.0
+python-jose==3.3.0  # For JWT support
+passlib==1.7.4      # For password hashing
