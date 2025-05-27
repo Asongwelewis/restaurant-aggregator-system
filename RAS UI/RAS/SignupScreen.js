@@ -8,19 +8,23 @@ import {
   TouchableOpacity,
   Dimensions,
   Image,
+  KeyboardAvoidingView,
+  Platform,
 } from 'react-native';
 import { Ionicons, FontAwesome, AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
+import { BlurView } from 'expo-blur';
 
 const { width, height } = Dimensions.get('window');
-const BUBBLE_HEIGHT = height * 0.55;
+const CARD_WIDTH = width * 0.9;
+const CARD_HEIGHT = height * 0.7;
 
-export default function SignupScreen({ navigation }) {
-  const bubbleScale = useRef(new Animated.Value(0)).current;
+export default function SignupScreen({ navigation, onClose }) {
+  const cardScale = useRef(new Animated.Value(0.8)).current;
   const [image, setImage] = useState(null);
 
   useEffect(() => {
-    Animated.spring(bubbleScale, {
+    Animated.spring(cardScale, {
       toValue: 1,
       friction: 7,
       useNativeDriver: true,
@@ -28,13 +32,11 @@ export default function SignupScreen({ navigation }) {
   }, []);
 
   const pickImage = async () => {
-    // Ask for permission
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== 'granted') {
       alert('Sorry, we need camera roll permissions to make this work!');
       return;
     }
-    // Pick image
     let result = await ImagePicker.launchImageLibraryAsync({
       mediaTypes: [ImagePicker.MediaType.IMAGE],
       allowsEditing: true,
@@ -48,102 +50,250 @@ export default function SignupScreen({ navigation }) {
   };
 
   return (
-    <View style={styles.container}>
-      {/* Sign in as Guest */}
-      <TouchableOpacity
-        style={styles.guestButton}
-        onPress={() => {
-          if (navigation) navigation.navigate('Home'); // Navigate to Home screen
-        }}
+    <View style={styles.bg}>
+      <KeyboardAvoidingView
+        style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <Ionicons name="person-outline" size={20} color="#27ae60" />
-        <Text style={styles.guestText}>Sign in as Guest</Text>
-      </TouchableOpacity>
-
-      {/* Animated Bubble */}
-      <Animated.View
-        style={[
-          styles.bubble,
-          {
-            transform: [{ scale: bubbleScale }],
-          },
-        ]}
-      >
-        {/* Avatar */}
-        <TouchableOpacity style={styles.avatarContainer} onPress={pickImage}>
-          {image ? (
-            <Image
-              source={{ uri: image }}
-              style={styles.avatarImage}
-            />
-          ) : (
-            <Ionicons name="person-add" size={90} color="#fff" />
-          )}
-          <Text style={styles.avatarHint}>Tap to add photo</Text>
-        </TouchableOpacity>
-        {/* Signup Fields */}
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your username"
-            placeholderTextColor="#eafaf1"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Enter your email"
-            placeholderTextColor="#eafaf1"
-            keyboardType="email-address"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Create a password"
-            placeholderTextColor="#eafaf1"
-            secureTextEntry
-          />
-        </View>
-      </Animated.View>
-
-      {/* Lower Section */}
-      <View style={styles.lowerSection}>
-        <TouchableOpacity
-          style={styles.signupButton}
-          onPress={() => {
-            // Handle sign up logic here
-          }}
-        >
-          <Text style={styles.signupText}>Sign Up</Text>
-        </TouchableOpacity>
-        <Text style={styles.orText}>or sign up with</Text>
-        <View style={styles.socialRow}>
-          <TouchableOpacity style={styles.socialButton}>
-            <AntDesign name="google" size={28} color="#db4437" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.socialButton}>
-            <FontAwesome name="facebook" size={28} color="#4267B2" />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.socialButton}>
-            <AntDesign name="apple1" size={28} color="#222" />
-          </TouchableOpacity>
-        </View>
-      </View>
+        <Animated.View style={[styles.cardWrapper, { transform: [{ scale: cardScale }] }]}>
+          <BlurView intensity={60} tint="light" style={styles.card}>
+            {/* Close Button */}
+            {onClose && (
+              <TouchableOpacity style={styles.closeButton} onPress={onClose}>
+                <Ionicons name="close" size={28} color="#444" />
+              </TouchableOpacity>
+            )}
+            {/* Avatar */}
+            <TouchableOpacity style={styles.avatarCircle} onPress={pickImage}>
+              {image ? (
+                <Image source={{ uri: image }} style={styles.avatarImage} />
+              ) : (
+                <Ionicons name="person-add" size={48} color="#fff" />
+              )}
+            </TouchableOpacity>
+            <Text style={styles.avatarHint}>Tap to add photo</Text>
+            <Text style={styles.title}>Create Account</Text>
+            <Text style={styles.subtitle}>Sign up to get started</Text>
+            <View style={styles.inputGroup}>
+              <TextInput
+                style={styles.input}
+                placeholder="Username"
+                placeholderTextColor="#b0b0b0"
+                autoCapitalize="none"
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Email"
+                placeholderTextColor="#b0b0b0"
+                keyboardType="email-address"
+                autoCapitalize="none"
+              />
+              <TextInput
+                style={styles.input}
+                placeholder="Password"
+                placeholderTextColor="#b0b0b0"
+                secureTextEntry
+              />
+            </View>
+            <TouchableOpacity
+              style={styles.signupButton}
+              onPress={() => {
+                // Handle sign up logic here
+              }}
+            >
+              <Text style={styles.signupButtonText}>Sign Up</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.loginLink}
+              onPress={() => navigation && navigation.navigate('Login')}
+            >
+              <Text style={styles.loginText}>
+                Already have an account?{' '}
+                <Text style={{ color: '#27ae60', fontWeight: 'bold' }}>Login</Text>
+              </Text>
+            </TouchableOpacity>
+            <View style={styles.dividerRow}>
+              <View style={styles.divider} />
+              <Text style={styles.orText}>or</Text>
+              <View style={styles.divider} />
+            </View>
+            <View style={styles.socialRow}>
+              <TouchableOpacity style={styles.socialButton}>
+                <AntDesign name="google" size={24} color="#db4437" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.socialButton}>
+                <FontAwesome name="facebook" size={24} color="#4267B2" />
+              </TouchableOpacity>
+              <TouchableOpacity style={styles.socialButton}>
+                <AntDesign name="apple1" size={24} color="#222" />
+              </TouchableOpacity>
+            </View>
+            {/* Guest Button */}
+            <TouchableOpacity
+              style={styles.guestButton}
+              onPress={() => {
+                if (navigation) navigation.navigate('Home');
+              }}
+            >
+              <Ionicons name="person-outline" size={20} color="#27ae60" />
+              <Text style={styles.guestText}>Sign in as Guest</Text>
+            </TouchableOpacity>
+          </BlurView>
+        </Animated.View>
+      </KeyboardAvoidingView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
+  bg: {
     flex: 1,
-    backgroundColor: '#eafaf1',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
+    backgroundColor: 'transparent',
   },
-  guestButton: {
+  cardWrapper: {
+    width: CARD_WIDTH,
+    minHeight: CARD_HEIGHT,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  card: {
+    width: '100%',
+    minHeight: CARD_HEIGHT,
+    borderRadius: 28,
+    padding: 28,
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.35)',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.12,
+    shadowRadius: 24,
+    elevation: 8,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  closeButton: {
     position: 'absolute',
-    top: 40,
-    left: 20,
+    top: 18,
+    right: 18,
+    zIndex: 10,
+    backgroundColor: 'rgba(255,255,255,0.7)',
+    borderRadius: 16,
+    padding: 4,
+  },
+  avatarCircle: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+    backgroundColor: '#27ae60',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 8,
+    marginTop: -36,
+    shadowColor: '#27ae60',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.18,
+    shadowRadius: 8,
+    elevation: 4,
+    overflow: 'hidden',
+  },
+  avatarImage: {
+    width: 72,
+    height: 72,
+    borderRadius: 36,
+  },
+  avatarHint: {
+    color: '#888',
+    fontSize: 13,
+    marginBottom: 8,
+    marginTop: -2,
+    opacity: 0.8,
+  },
+  title: {
+    fontSize: 26,
+    fontWeight: 'bold',
+    color: '#222',
+    marginBottom: 4,
+    marginTop: 6,
+  },
+  subtitle: {
+    fontSize: 15,
+    color: '#888',
+    marginBottom: 22,
+  },
+  inputGroup: {
+    width: '100%',
+    marginBottom: 18,
+  },
+  input: {
+    backgroundColor: 'rgba(241,243,246,0.7)',
+    borderRadius: 16,
+    paddingHorizontal: 18,
+    paddingVertical: 13,
+    marginVertical: 7,
+    color: '#222',
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#e0e0e0',
+  },
+  signupButton: {
+    backgroundColor: '#27ae60cc',
+    paddingVertical: 14,
+    borderRadius: 18,
+    width: '100%',
+    alignItems: 'center',
+    marginTop: 6,
+    marginBottom: 10,
+    elevation: 2,
+  },
+  signupButtonText: {
+    color: '#fff',
+    fontSize: 18,
+    fontWeight: 'bold',
+  },
+  loginLink: {
+    marginTop: 2,
+    marginBottom: 12,
+  },
+  loginText: {
+    color: '#888',
+    fontSize: 15,
+  },
+  dividerRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    zIndex: 10,
+    width: '100%',
+    marginVertical: 10,
+  },
+  divider: {
+    flex: 1,
+    height: 1,
+    backgroundColor: '#e0e0e0',
+  },
+  orText: {
+    marginHorizontal: 10,
+    color: '#bbb',
+    fontSize: 15,
+  },
+  socialRow: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    width: '100%',
+    marginTop: 6,
+  },
+  socialButton: {
+    backgroundColor: 'rgba(241,243,246,0.7)',
+    borderRadius: 50,
+    padding: 13,
+    marginHorizontal: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 1,
+  },
+  guestButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    alignSelf: 'center',
+    marginTop: 18,
     backgroundColor: '#fff',
     paddingVertical: 6,
     paddingHorizontal: 14,
@@ -157,92 +307,5 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 6,
     fontSize: 15,
-  },
-  bubble: {
-    position: 'absolute',
-    top: 0,
-    left: -width * 0.1,
-    width: width * 1.2,
-    height: BUBBLE_HEIGHT,
-    backgroundColor: '#27ae60',
-    borderBottomLeftRadius: width,
-    borderBottomRightRadius: width,
-    alignItems: 'center',
-    paddingTop: 60,
-    zIndex: 2,
-  },
-  avatarContainer: {
-    marginBottom: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarImage: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    borderWidth: 2,
-    borderColor: '#fff',
-    backgroundColor: '#c8f7dc',
-  },
-  avatarHint: {
-    color: '#fff',
-    fontSize: 13,
-    marginTop: 4,
-    opacity: 0.8,
-  },
-  inputContainer: {
-    width: '80%',
-  },
-  input: {
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 25,
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    marginVertical: 8,
-    color: '#fff',
-    fontSize: 16,
-    borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.3)',
-  },
-  lowerSection: {
-    position: 'absolute',
-    top: BUBBLE_HEIGHT - 30,
-    width: '100%',
-    alignItems: 'center',
-    paddingTop: 40,
-    zIndex: 1,
-  },
-  signupButton: {
-    backgroundColor: '#27ae60',
-    paddingVertical: 14,
-    paddingHorizontal: 80,
-    borderRadius: 30,
-    marginVertical: 10,
-    alignItems: 'center',
-    elevation: 2,
-  },
-  signupText: {
-    color: '#fff',
-    fontSize: 20,
-    fontWeight: 'bold',
-  },
-  orText: {
-    color: '#888',
-    marginVertical: 18,
-    fontSize: 16,
-  },
-  socialRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    marginTop: 4,
-  },
-  socialButton: {
-    backgroundColor: '#fff',
-    borderRadius: 50,
-    padding: 12,
-    marginHorizontal: 12,
-    elevation: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });

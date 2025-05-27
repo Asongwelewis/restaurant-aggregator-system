@@ -35,7 +35,7 @@ function MainTabs() {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="mainHome" component={HomeScreen} />
       <Tab.Screen name="Reservations" component={ReservationsScreen} />
       <Tab.Screen name="Marketplace" component={MarketplaceScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />

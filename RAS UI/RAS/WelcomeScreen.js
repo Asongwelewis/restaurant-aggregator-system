@@ -1,5 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Animated, TouchableOpacity, Dimensions } from 'react-native';
+import LoginScreen from './LoginScreen'; // Add this at the top
 
 const { width, height } = Dimensions.get('window');
 
@@ -79,6 +80,7 @@ function FloatingBubble({ size, initialTop, initialLeft, delay }) {
 export default function WelcomeScreen({ navigation }) {
   const [showTitle, setShowTitle] = useState(false);
   const [showButton, setShowButton] = useState(false);
+  const [showLogin, setShowLogin] = useState(false); // Add this line
   const titleOpacity = useRef(new Animated.Value(0)).current;
   const buttonOpacity = useRef(new Animated.Value(0)).current;
 
@@ -119,15 +121,23 @@ export default function WelcomeScreen({ navigation }) {
       )}
 
       {/* Get Started Button */}
-      {showButton && (
+      {showButton && !showLogin && (
         <Animated.View style={{ opacity: buttonOpacity }}>
           <TouchableOpacity
             style={styles.getStartedButton}
-            onPress={() => navigation.navigate('Login')}
+            onPress={() => setShowLogin(true)}
           >
             <Text style={styles.getStartedButtonText}>Get Started</Text>
           </TouchableOpacity>
         </Animated.View>
+      )}
+
+      {/* Login Overlay */}
+      {showLogin && (
+        <LoginScreen
+          navigation={navigation}
+          onClose={() => setShowLogin(false)}
+        />
       )}
     </View>
   );
