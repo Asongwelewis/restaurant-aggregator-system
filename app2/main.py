@@ -6,14 +6,25 @@ from app2.models import UserLogin
 from app2.auth import login_with_email_password
 from app2.auth import register_user , verify_firebase_token
 from app2.models import UserRegister
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from fastapi import Request
+from slowapi.errors import RateLimitExceeded
+from slowapi.decorator import limiter
+
+limiter = Limiter(key_func=get_remote_address)
+
 
 app = FastAPI(
     description="Restaurant Aggregator System API",
     title="Restaurant Aggregator System",
     docs_url="/"
 )
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 @app.post("/register")
+@limiter.limit("5/minute")
 async def register(user: UserRegister):
     try:
         uid = register_user(user.username, user.email, user.password)
