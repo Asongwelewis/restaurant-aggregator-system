@@ -6,9 +6,11 @@ from firebase_admin import auth as firebase_auth
 from firebase_admin import auth, credentials, exceptions
 from fastapi import HTTPException
 
-cred = credentials.Certificate("service-account.json")
+cred = credentials.Certificate(r"C:\Users\840 G5\Auth and user management\restaurant-aggregator-system\app2\service-account.json")
 if not firebase_admin._apps:
-    firebase_app = firebase_admin.initialize_app(cred)
+    firebase_app = firebase_admin.initialize_app(cred, {
+    "databaseURL": "https://ras-3854a-default-rtdb.firebaseio.com"  # Replace with your Firebase RTDB URL
+})
 
 load_dotenv()
 # FIREBASE_WEB_API_KEY = os.getenv("FIREBASE_WEB_API_KEY")
@@ -16,6 +18,13 @@ load_dotenv()
 def register_user(username: str, email: str, password: str):
     try:
         user_record = auth.create_user(email=email, password=password)
+
+        db.reference(f"users/{user_record.uid}").set({
+            "email": email,
+            "name": name,
+            "phone": phone,
+            "role": "user"  # Default role
+        })
         return user_record.uid
     except auth.EmailAlreadyExistsError:
         raise HTTPException(status_code=400, detail="Email already exists")
@@ -24,12 +33,12 @@ def register_user(username: str, email: str, password: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal error: {str(e)}")
 
-# def verify_firebase_token(id_token: str):
-#     try:
-#         decoded = firebase_auth.verify_id_token(id_token)
-#         return decoded["uid"]
-#     except Exception:
-#         raise HTTPException(status_code=401, detail="Invalid ID token")
+def verify_firebase_token(id_token: str):
+    try:
+        decoded = firebase_auth.verify_id_token(id_token)
+        return decoded["uid"]
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid ID token")
 
 def login_with_email_password(email: str, password: str):
     url = "https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyA4ZSAip_7BWgu7LJhbb8kSjZnsVp27Pp4"
@@ -48,3 +57,13 @@ def login_with_email_password(email: str, password: str):
         "refresh_token": data["refreshToken"],
         "uid": data["localId"]
     }
+
+def get_current_user(id_token: str = Header(...)):
+    """
+    Dependency to extract and verify Firebase token
+    """
+    try:
+        decoded = firebase_auth.verify_id_token(id_token)
+        return decoded["uid"]
+    except Exception:
+        raise HTTPException(status_code=401, detail="Invalid or expired ID token")
