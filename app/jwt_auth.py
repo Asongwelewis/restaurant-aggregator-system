@@ -1,4 +1,3 @@
-# app/jwt_auth.py
 
 import jwt
 from datetime import datetime, timedelta
@@ -8,13 +7,12 @@ import os
 
 load_dotenv()
 
-# SECRET_KEY = os.getenv("JWT_SECRET")
-SECRET_KEY = os.getenv("JWT_SECRET")
-if not SECRET_KEY:
-    raise ValueError("JWT_SECRET is not set in .env file!")
+SECRET_KEY = 'TfV5snK9v7mONySkFZmnp7qtARSIW4RxH5l2p9RGcSg' # os.getenv("JWT_SECRET")
+# if not SECRET_KEY:
+#     raise ValueError("JWT_SECRET is not set in .env file!")
 
-EXPIRE_MINUTES = int(os.getenv("JWT_EXPIRE_MINUTES", "60"))
-ALGORITHM = "RS256"
+EXPIRE_MINUTES = int(60) #os.getenv("JWT_EXPIRE_MINUTES", "60"))
+ALGORITHM = "HS256"
 
 def create_jwt_token(payload: dict):
     to_encode = payload.copy()

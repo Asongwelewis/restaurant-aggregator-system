@@ -1,6 +1,7 @@
 {
   "project_info": {
     "project_number": "688951666235",
+    "firebase_url": "https://ras-3854a-default-rtdb.firebaseio.com",
     "project_id": "ras-3854a",
     "storage_bucket": "ras-3854a.firebasestorage.app"
   },
@@ -12,7 +13,12 @@
           "package_name": "myapp.com"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "688951666235-i1bqupfojh27espr5u2gc80l8pgs9s7q.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyA4ZSAip_7BWgu7LJhbb8kSjZnsVp27Pp4"
@@ -20,7 +26,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "688951666235-i1bqupfojh27espr5u2gc80l8pgs9s7q.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
