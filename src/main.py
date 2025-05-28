@@ -1,23 +1,14 @@
 from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
-from restaurants import router as restaurants_router
-from ratings import router as ratings_router
-from auth import router as auth_router  # Add this import
+from routes import menus, bookings, ratings, status, search
 
-app = FastAPI(title="Restaurant API", version="1.0")
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Include auth router first
-app.include_router(auth_router, prefix="/api/v1")
-app.include_router(restaurants_router, prefix="/api/v1")
-app.include_router(ratings_router, prefix="/api/v1")
+app = FastAPI()
 
 @app.get("/")
-def health_check():
-    return dict(status="ok")
+def read_root():
+    return {"message": "Welcome to the RAS Restaurant Booking API 🚀"}
+
+app.include_router(menus.router)
+app.include_router(bookings.router)
+app.include_router(ratings.router)
+app.include_router(status.router)
+app.include_router(search.router)

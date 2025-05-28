@@ -3,7 +3,7 @@ from firebase_admin import firestore
 from pydantic import BaseModel
 from typing import List, Optional
 
-router = APIRouter()
+router = APIRouter(prefix="/api/v1")
 
 # Models
 class Restaurant(BaseModel):
@@ -35,3 +35,6 @@ async def get_restaurants(
         return [doc.to_dict() for doc in query.stream()]
     except Exception as e:
         raise HTTPException(500, f"Database error: {str(e)}")
+    @router.post("/restaurants/{restaurant_id}/rate")
+    async def rate_restaurant(restaurant_id: int, value: float):
+        return {"message": f"Rated restaurant {restaurant_id} with {value}"}
