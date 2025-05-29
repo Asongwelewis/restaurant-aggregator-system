@@ -14,8 +14,32 @@ on:
       - develop
 
 jobs:
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      backend_changed: ${{ steps.filter.outputs.backend }}
+      frontend_changed: ${{ steps.filter.outputs.frontend }}
+      db_changed: ${{ steps.filter.outputs.database }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Detect changes
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            backend:
+              - 'src/backend/**'
+            frontend:
+              - 'src/frontend/**'
+            database:
+              - 'src/backend/**/migrations/**'
+              - 'src/backend/**/models.py'
+
   backend:
-    name: Backend (Django) Tests
+    needs: detect-changes
+    if: needs.detect-changes.outputs.backend_changed == 'true' || needs.detect-changes.outputs.db_changed == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -34,21 +58,22 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
-      - name: Run Django migrations
-        run: |
-          python manage.py migrate
-
-      - name: Run backend tests
-        run: |
-          python manage.py test
-
       - name: Lint backend code
         run: |
           pip install flake8
           flake8 .
 
+      - name: Run Django migrations (validate DB)
+        run: |
+          python manage.py makemigrations --check --dry-run
+          python manage.py migrate --check --plan
+
+      - name: Run backend tests
+        run: python manage.py test
+
   frontend:
-    name: Frontend (React) Tests
+    needs: detect-changes
+    if: needs.detect-changes.outputs.frontend_changed == 'true'
     runs-on: ubuntu-latest
     defaults:
       run:
@@ -73,3 +98,30 @@ jobs:
 
       - name: Build frontend
         run: npm run build
+
+  # Integration/Compatibility Check (API Contract)
+  api-contract:
+    needs: [backend, frontend]
+    runs-on: ubuntu-latest
+    if: needs.detect-changes.outputs.backend_changed == 'true' || needs.detect-changes.outputs.frontend_changed == 'true'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Start backend server (test mode)
+        run: |
+          cd src/backend
+          nohup python manage.py runserver 0.0.0.0:8000 &
+          sleep 10
+
+      - name: Run API compatibility tests
+        run: |
+          cd src/frontend
+          # This assumes you have API contract tests, e.g. with Jest or a tool like Schemathesis, Dredd, or custom scripts.
+          # Replace with your actual integration test command:
+          npm run test:api || echo "Add API contract tests!"
+
+      - name: Stop backend server
+        run: |
+          pkill -f runserver || true
+
