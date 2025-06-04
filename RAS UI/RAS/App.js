@@ -14,7 +14,7 @@ import ReservationsScreen from './ReservationsScreen';
 import RestaurantProfileScreen from './RestaurantProfileScreen';
 import UserProfileScreen from './UserProfileScreen';
 import { Ionicons, FontAwesome5, MaterialIcons, Entypo } from '@expo/vector-icons';
-
+import SplashScreen from './SplashScreen';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -45,6 +45,12 @@ function MainTabs() {
 }
 
 export default function App() {
+  const [showSplash, setShowSplash] = React.useState(true);
+
+  if (showSplash) {
+    return <SplashScreen onFinish={() => setShowSplash(false)} />;
+  }
+
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>

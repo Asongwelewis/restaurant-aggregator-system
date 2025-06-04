@@ -11,6 +11,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
+import { MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import RestaurantProfileScreen from './RestaurantProfileScreen'; // Make sure this exists
 import UserProfileScreen from './UserProfileScreen'; // You will create this below
 
@@ -159,10 +160,21 @@ function generatePosts() {
   return posts;
 }
 
+// Add your filter options here
+const FILTERS = [
+  { key: 'all', label: 'All', icon: <Ionicons name="fast-food" size={22} color="#27ae60" /> },
+  { key: 'pizza', label: 'Pizza', icon: <MaterialCommunityIcons name="pizza" size={22} color="#e17055" /> },
+  { key: 'sushi', label: 'Sushi', icon: <MaterialCommunityIcons name="fish" size={22} color="#0984e3" /> },
+  { key: 'burger', label: 'Burger', icon: <FontAwesome5 name="hamburger" size={22} color="#fdcb6e" /> },
+  { key: 'vegan', label: 'Vegan', icon: <MaterialCommunityIcons name="leaf" size={22} color="#00b894" /> },
+  { key: 'dessert', label: 'Dessert', icon: <MaterialCommunityIcons name="cupcake" size={22} color="#d35400" /> },
+];
+
 export default function HomeScreen({ navigation }) {
   const [posts, setPosts] = useState(generatePosts());
   const [composerText, setComposerText] = useState('');
-  const [likedPosts, setLikedPosts] = useState({}); // Track liked state by post id
+  const [likedPosts, setLikedPosts] = useState({});
+  const [activeFilter, setActiveFilter] = useState('all');
 
   const renderStars = (count) => (
     <View style={{ flexDirection: 'row', marginTop: 2 }}>
@@ -305,12 +317,49 @@ export default function HomeScreen({ navigation }) {
     );
   };
 
+  // Filtering logic
+  const filteredPosts = posts.filter(item => {
+    if (item.type !== 'post') return true; // keep restaurant lists
+    if (activeFilter === 'all') return true;
+    const type = item.restaurant?.toLowerCase() || '';
+    if (activeFilter === 'pizza') return type.includes('pizza');
+    if (activeFilter === 'sushi') return type.includes('sushi');
+    if (activeFilter === 'burger') return type.includes('burger');
+    if (activeFilter === 'vegan') return type.includes('vegan') || type.includes('garden');
+    if (activeFilter === 'dessert') return type.includes('dessert') || type.includes('café') || type.includes('cake');
+    return true;
+  });
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>oodis</Text>
         <Ionicons name="search" size={28} color="#27ae60" />
+      </View>
+
+      {/* Filter Bar */}
+      <View style={styles.filterBar}>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 10 }}>
+          {FILTERS.map(f => (
+            <TouchableOpacity
+              key={f.key}
+              style={[
+                styles.filterBtn,
+                activeFilter === f.key && styles.filterBtnActive,
+              ]}
+              onPress={() => setActiveFilter(f.key)}
+            >
+              {f.icon}
+              <Text style={[
+                styles.filterLabel,
+                activeFilter === f.key && styles.filterLabelActive,
+              ]}>
+                {f.label}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </ScrollView>
       </View>
 
       {/* Composer */}
@@ -329,7 +378,7 @@ export default function HomeScreen({ navigation }) {
 
       {/* Feed */}
       <FlatList
-        data={posts}
+        data={filteredPosts}
         keyExtractor={item => item.id}
         renderItem={renderPost}
         contentContainerStyle={{ paddingBottom: 20 }}
@@ -342,7 +391,7 @@ export default function HomeScreen({ navigation }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#eafaf1',
+    backgroundColor: '#fff', // changed from '#eafaf1' to white
   },
   header: {
     flexDirection: 'row',
@@ -497,5 +546,35 @@ const styles = StyleSheet.create({
     color: '#27ae60',
     fontWeight: 'bold',
     fontSize: 15,
+  },
+  filterBar: {
+    flexDirection: 'row',
+    paddingVertical: 8,
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#eafaf1',
+    marginBottom: 2,
+  },
+  filterBtn: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginHorizontal: 10,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+    borderRadius: 16,
+    backgroundColor: '#f4f4f4',
+    minWidth: 60,
+  },
+  filterBtnActive: {
+    backgroundColor: '#CAFF4E',
+  },
+  filterLabel: {
+    fontSize: 12,
+    color: '#27ae60',
+    marginTop: 2,
+    fontWeight: 'bold',
+  },
+  filterLabelActive: {
+    color: '#222',
   },
 });
