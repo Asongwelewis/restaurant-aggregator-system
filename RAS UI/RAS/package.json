@@ -10,11 +10,19 @@
     "web": "expo start --web"
   },
   "dependencies": {
+    "@react-navigation/bottom-tabs": "^7.3.13",
+    "@react-navigation/native": "^7.1.9",
+    "@react-navigation/stack": "^7.3.2",
     "expo": "~53.0.9",
+    "expo-blur": "^14.1.4",
     "expo-dev-client": "~5.1.8",
+    "expo-image-picker": "~16.1.4",
     "expo-status-bar": "~2.2.3",
     "react": "19.0.0",
-    "react-native": "0.79.2"
+    "react-native": "0.79.2",
+    "react-native-maps": "^1.20.1",
+    "react-native-safe-area-context": "^5.4.0",
+    "react-native-screens": "~4.10.0"
   },
   "devDependencies": {
     "@babel/core": "^7.26.0"

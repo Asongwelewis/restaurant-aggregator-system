@@ -1,21 +1,68 @@
-import { StatusBar } from 'expo-status-bar';
-import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import * as React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+import WelcomeScreen from './WelcomeScreen';
+import LoginScreen from './LoginScreen';
+import SignupScreen from './SignupScreen';
+import HomeScreen from './HomeScreen';
+import PostDetailScreen from './PostDetailScreen';
+import MarketplaceScreen from './MarketplaceScreen';
+import ProfileScreen from './ProfileScreen';
+import MapScreen from './MapScreen';
+import ReservationsScreen from './ReservationsScreen';
+import RestaurantProfileScreen from './RestaurantProfileScreen';
+import UserProfileScreen from './UserProfileScreen';
+import { Ionicons, FontAwesome5, MaterialIcons, Entypo } from '@expo/vector-icons';
+import SplashScreen from './SplashScreen';
+const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 
-export default function App() {
+function MainTabs() {
   return (
-    <View style={styles.container}>
-      <Text>You mother sucker</Text>
-      <StatusBar style="auto" />
-    </View>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarActiveTintColor: '#27ae60',
+        tabBarInactiveTintColor: '#888',
+        tabBarStyle: { backgroundColor: '#fff', borderTopColor: '#d4f3e3' },
+        tabBarIcon: ({ color, size }) => {
+          if (route.name === 'Home') return <Ionicons name="home" size={size} color={color} />;
+          if (route.name === 'Reservations') return <FontAwesome5 name="calendar-check" size={size} color={color} />;
+          if (route.name === 'Marketplace') return <MaterialIcons name="storefront" size={size} color={color} />;
+          if (route.name === 'Profile') return <Ionicons name="person-circle" size={size} color={color} />;
+          if (route.name === 'Map') return <Entypo name="map" size={size} color={color} />;
+        },
+      })}
+    >
+      <Tab.Screen name="mainHome" component={HomeScreen} />
+      <Tab.Screen name="Reservations" component={ReservationsScreen} />
+      <Tab.Screen name="Marketplace" component={MarketplaceScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen name="Map" component={MapScreen} />
+    </Tab.Navigator>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-});
+export default function App() {
+  const [showSplash, setShowSplash] = React.useState(true);
+
+  if (showSplash) {
+    return <SplashScreen onFinish={() => setShowSplash(false)} />;
+  }
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Signup" component={SignupScreen} />
+        <Stack.Screen name="Home" component={MainTabs} />
+        <Stack.Screen name="PostDetail" component={PostDetailScreen} />
+        <Stack.Screen name="Reservations" component={ReservationsScreen} />
+        <Stack.Screen name="RestaurantProfile" component={RestaurantProfileScreen} />
+        <Stack.Screen name="UserProfile" component={UserProfileScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
