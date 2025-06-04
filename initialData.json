@@ -1,0 +1,110 @@
+{
+  "users": {
+    "user_123": {
+      "name": "John Doe",
+      "email": "john@example.com",
+      "phone": "1234567890",
+      "address": "address_456"
+    }
+  },
+  "addresses": {
+    "address_456": {
+      "street": "123 Main St",
+      "city": "New York",
+      "state": "NY",
+      "zip_code": "10001",
+      "coordinates": {
+        "lat": 40.7128,
+        "lng": -74.0060
+      }
+    }
+  },
+  "registeredUsers": {
+    "user_123": {
+      "password_hash": "hashed_pw",
+      "salt": "random_salt",
+      "dietary_preferences": "vegan"
+    }
+  },
+  "authSessions": {
+    "session_789": {
+      "user_id": "user_123",
+      "token": "jwt_token",
+      "expires_at": "2025-06-01T12:00:00Z"
+    }
+  },
+  "restaurants": {
+    "rest_001": {
+      "owner_id": "user_123",
+      "name": "Pasta House",
+      "cuisine_type": "Italian",
+      "rating": 4.5,
+      "operating_hours": {
+        "mon": "9-17",
+        "tue": "9-17"
+      },
+      "address": "address_456"
+    }
+  },
+  "menuItems": {
+    "item_001": {
+      "restaurant_id": "rest_001",
+      "name": "Spaghetti",
+      "description": "Classic Italian pasta",
+      "price": 12.99,
+      "dietary_info": "vegetarian",
+      "is_available": true
+    }
+  },
+  "bookings": {
+    "booking_001": {
+      "user_id": "user_123",
+      "restaurant_id": "rest_001",
+      "date_time": "2025-06-10T19:00:00Z",
+      "party_size": 4,
+      "status": "confirmed"
+    }
+  },
+  "payments": {
+    "payment_001": {
+      "booking_id": "booking_001",
+      "amount": 51.96,
+      "method": "credit_card",
+      "status": "paid",
+      "transaction_date": "2025-05-28T12:30:00Z"
+    }
+  },
+  "adCampaigns": {
+    "campaign_001": {
+      "restaurant_id": "rest_001",
+      "budget": 500,
+      "target_radius": 10,
+      "duration_days": 30,
+      "start_date": "2025-06-01"
+    }
+  },
+  "campaignMetrics": {
+    "metrics_001": {
+      "campaign_id": "campaign_001",
+      "date": "2025-06-02",
+      "impressions": 1000,
+      "clicks": 100,
+      "conversions": 10
+    }
+  },
+  "reviews": {
+    "review_001": {
+      "user_id": "user_123",
+      "restaurant_id": "rest_001",
+      "rating": 5,
+      "comment": "Fantastic!",
+      "timestamp": "2025-05-28T12:45:00Z"
+    }
+  },
+  "photos": {
+    "photo_001": {
+      "review_id": "review_001",
+      "url": "https://example.com/photo1.jpg"
+    }
+  }
+}
