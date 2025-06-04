@@ -1,6 +1,6 @@
 import React, { useRef, useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Animated, TouchableOpacity, Dimensions } from 'react-native';
-import LoginScreen from './LoginScreen'; // Add this at the top
+import LoginScreen from './LoginScreen'; //please ensure this path is correct based on the project structure
 
 const { width, height } = Dimensions.get('window');
 
@@ -65,7 +65,7 @@ function FloatingBubble({ size, initialTop, initialLeft, delay }) {
         {
           width: size,
           height: size,
-          backgroundColor: 'rgba(46, 204, 113, 0.25)',
+          backgroundColor: 'rgb(149, 204, 46)',
           position: 'absolute',
           top: top,
           left: left,
@@ -107,7 +107,7 @@ export default function WelcomeScreen({ navigation }) {
 
   return (
     <View style={styles.container}>
-      {/* Floating Bubbles */}
+      {/* Floating Bubbles */}// scrum master adjust size an dposition as needed 
       <FloatingBubble size={180} initialTop={-40} initialLeft={-60} delay={0} />
       <FloatingBubble size={120} initialTop={height * 0.2} initialLeft={width * 0.7} delay={300} />
       <FloatingBubble size={90} initialTop={height * 0.6} initialLeft={-30} delay={600} />
@@ -116,7 +116,7 @@ export default function WelcomeScreen({ navigation }) {
       {/* App Title */}
       {showTitle && (
         <Animated.View style={{ opacity: titleOpacity }}>
-          <Text style={styles.title}>Oodis</Text>
+          <Text style={styles.title}>Odis</Text>
         </Animated.View>
       )}
 
