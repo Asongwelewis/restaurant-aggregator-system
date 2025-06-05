@@ -1,9 +1,15 @@
 import React, { useState } from 'react';
 import {
-  View, Text, StyleSheet, FlatList, Image, TouchableOpacity, TextInput,
-  SafeAreaView, ScrollView, Modal, Button
+  View,
+  Text,
+  StyleSheet,
+  FlatList,
+  Image,
+  TouchableOpacity,
+  TextInput,
+  SafeAreaView,
+  ScrollView,
 } from 'react-native';
-import * as ImagePicker from 'expo-image-picker';
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import RestaurantProfileScreen from './RestaurantProfileScreen'; // Make sure this exists
@@ -167,32 +173,8 @@ const FILTERS = [
 export default function HomeScreen({ navigation }) {
   const [posts, setPosts] = useState(generatePosts());
   const [composerText, setComposerText] = useState('');
-  const [composerVisible, setComposerVisible] = useState(false);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [mentionedRestaurant, setMentionedRestaurant] = useState('');
-  // Example restaurant list for mention (replace with your data)
-  const restaurantNames = ['Green Garden', 'Oceanic', 'Mountain Dine', 'Urban Bites', 'Sunset Grill', 'City Eats'];
-
-  // Open image picker
-  const pickImage = async () => {
-    let result = await ImagePicker.launchImageLibraryAsync({
-      mediaTypes: ImagePicker.MediaTypeOptions.Images,
-      allowsEditing: true,
-      quality: 0.7,
-    });
-    if (!result.canceled) {
-      setSelectedImage(result.assets[0].uri);
-    }
-  };
-
-  // Handle post submit (add your logic here)
-  const handlePost = () => {
-    // You can push the new post to your posts array here
-    setComposerVisible(false);
-    setComposerText('');
-    setSelectedImage(null);
-    setMentionedRestaurant('');
-  };
+  const [likedPosts, setLikedPosts] = useState({});
+  const [activeFilter, setActiveFilter] = useState('all');
 
   const renderStars = (count) => (
     <View style={{ flexDirection: 'row', marginTop: 2 }}>
@@ -383,65 +365,16 @@ export default function HomeScreen({ navigation }) {
       {/* Composer */}
       <View style={styles.composer}>
         <Ionicons name="restaurant" size={32} color="#27ae60" />
-        <TouchableOpacity
+        <TextInput
           style={styles.composerInput}
-          onPress={() => setComposerVisible(true)}
-        >
-          <Text style={{ color: '#888' }}>
-            Share a new dish or review...
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.composerBtn} onPress={() => setComposerVisible(true)}>
+          placeholder="Share a new dish or review..."
+          value={composerText}
+          onChangeText={setComposerText}
+        />
+        <TouchableOpacity style={styles.composerBtn}>
           <FontAwesome name="send" size={20} color="#fff" />
         </TouchableOpacity>
       </View>
-
-      {/* Composer Modal */}
-      <Modal
-        visible={composerVisible}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setComposerVisible(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={{ fontWeight: 'bold', fontSize: 18, marginBottom: 10 }}>Share a new dish or review</Text>
-            <TextInput
-              style={styles.modalInput}
-              placeholder="Write something..."
-              value={composerText}
-              onChangeText={setComposerText}
-              multiline
-            />
-            <Text style={{ marginTop: 10 }}>Mention a restaurant:</Text>
-            <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginVertical: 8 }}>
-              {restaurantNames.map(name => (
-                <TouchableOpacity
-                  key={name}
-                  style={[
-                    styles.mentionBtn,
-                    mentionedRestaurant === name && { backgroundColor: '#CAFF4E' }
-                  ]}
-                  onPress={() => setMentionedRestaurant(name)}
-                >
-                  <Text style={{ color: '#27ae60', fontWeight: 'bold' }}>{name}</Text>
-                </TouchableOpacity>
-              ))}
-            </ScrollView>
-            <TouchableOpacity style={styles.imagePickerBtn} onPress={pickImage}>
-              <Ionicons name="image" size={24} color="#27ae60" />
-              <Text style={{ marginLeft: 8, color: '#27ae60' }}>Add Photo</Text>
-            </TouchableOpacity>
-            {selectedImage && (
-              <Image source={{ uri: selectedImage }} style={styles.previewImage} />
-            )}
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 20 }}>
-              <Button title="Cancel" color="#888" onPress={() => setComposerVisible(false)} />
-              <Button title="Post" color="#27ae60" onPress={handlePost} />
-            </View>
-          </View>
-        </View>
-      </Modal>
 
       {/* Feed */}
       <FlatList
@@ -489,11 +422,8 @@ const styles = StyleSheet.create({
   composerInput: {
     flex: 1,
     marginHorizontal: 10,
-    backgroundColor: '#f4f4f4',
-    borderRadius: 20,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    justifyContent: 'center',
+    fontSize: 16,
+    color: '#222',
   },
   composerBtn: {
     backgroundColor: '#27ae60',
@@ -646,52 +576,5 @@ const styles = StyleSheet.create({
   },
   filterLabelActive: {
     color: '#222',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.18)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    width: '90%',
-    backgroundColor: '#fff',
-    borderRadius: 18,
-    padding: 20,
-    elevation: 5,
-  },
-  modalInput: {
-    minHeight: 60,
-    borderColor: '#eafaf1',
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 10,
-    marginTop: 8,
-    textAlignVertical: 'top',
-  },
-  mentionBtn: {
-    backgroundColor: '#f4f4f4',
-    borderRadius: 14,
-    paddingVertical: 6,
-    paddingHorizontal: 14,
-    marginRight: 8,
-    borderWidth: 1,
-    borderColor: '#eafaf1',
-  },
-  imagePickerBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginTop: 12,
-    backgroundColor: '#f4f4f4',
-    padding: 10,
-    borderRadius: 10,
-    alignSelf: 'flex-start',
-  },
-  previewImage: {
-    width: 120,
-    height: 120,
-    borderRadius: 10,
-    marginTop: 10,
-    alignSelf: 'center',
   },
 });
