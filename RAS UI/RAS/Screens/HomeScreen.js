@@ -13,7 +13,7 @@ import {
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import RestaurantProfileScreen from './RestaurantProfileScreen'; // Make sure this exists
-import UserProfileScreen from '../UserProfileScreen'; // You will create this below
+import UserProfileScreen from './UserProfileScreen'; // You will create this below
 
 // Sample restaurant lists for horizontal scroll
 const restaurantLists = [
@@ -335,7 +335,9 @@ export default function HomeScreen({ navigation }) {
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>oodis</Text>
-        <Ionicons name="search" size={28} color="#27ae60" />
+        <TouchableOpacity onPress={() => navigation.navigate('Search')}>
+          <Ionicons name="search" size={28} color="#27ae60" />
+        </TouchableOpacity>
       </View>
 
       {/* Filter Bar */}

@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { View, StyleSheet, Animated, Image, ActivityIndicator, Dimensions } from 'react-native';
+import { View, StyleSheet, Animated, Image, ActivityIndicator, Dimensions, Text } from 'react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -17,7 +17,23 @@ export default function SplashScreen({ onFinish }) {
     useRef(new Animated.Value(0)).current,
   ];
 
+  // Animated refs for each letter in "Welcome"
+  const welcomeLetters = 'Welcome'.split('');
+  const letterOpacities = useRef(welcomeLetters.map(() => new Animated.Value(0))).current;
+
   useEffect(() => {
+    // Animate "Welcome" letters one by one
+    Animated.stagger(
+      120,
+      letterOpacities.map(op =>
+        Animated.timing(op, {
+          toValue: 1,
+          duration: 350,
+          useNativeDriver: true,
+        })
+      )
+    ).start();
+
     // Simulate loading (replace with your real loading logic)
     setTimeout(() => {
       // Animate big circle shrinking and small bubbles appearing
@@ -61,6 +77,21 @@ export default function SplashScreen({ onFinish }) {
         ]}
       />
 
+      {/* "Welcome" animated text */}
+      <View style={styles.welcomeContainer}>
+        {welcomeLetters.map((letter, idx) => (
+          <Animated.Text
+            key={idx}
+            style={[
+              styles.welcomeLetter,
+              { opacity: letterOpacities[idx] }
+            ]}
+          >
+            {letter}
+          </Animated.Text>
+        ))}
+      </View>
+
       {/* Small Bubbles (appear after big circle animates out) */}
       {bubblesConfig.map((cfg, idx) => (
         <Animated.View
@@ -82,7 +113,7 @@ export default function SplashScreen({ onFinish }) {
       {/* Plate and Spoon Image at the Bottom */}
       <View style={styles.bottomImageContainer}>
         <Image
-          source={require('./assets/plate_spoon.png')}
+          source={require('../assets/plate_spoon.png')}
           style={styles.plateImage}
           resizeMode="contain"
         />
@@ -134,5 +165,22 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: height * 0.55,
     alignSelf: 'center',
+  },
+  welcomeContainer: {
+    position: 'absolute',
+    top: height * 0.19,
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    zIndex: 10,
+  },
+  welcomeLetter: {
+    fontSize: 44,
+    fontWeight: 'bold',
+    color: '#27ae60',
+    letterSpacing: 2,
+    textShadowColor: 'rgba(39, 174, 96, 0.13)',
+    textShadowOffset: { width: 2, height: 2 },
+    textShadowRadius: 8,
   },
 });
