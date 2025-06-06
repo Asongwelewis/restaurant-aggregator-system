@@ -1,15 +1,24 @@
-import React from 'react';
+import * as React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import MainHomeScreen from './MainHomeScreen';
-import ReservationsScreen from './ReservationsScreen';
-import MarketplaceScreen from './MarketplaceScreen';
-import ProfileScreen from './ProfileScreen';
-import MapScreen from './MapScreen';
-
+import WelcomeScreen from './Screens/WelcomeScreen';
+import LoginScreen from './Screens/LoginScreen';
+import SignupScreen from './Screens/SignupScreen';
+import HomeScreen from './Screens/HomeScreen';
+import PostDetailScreen from './Screens/PostDetailScreen';
+import MarketplaceScreen from './Screens/MarketplaceScreen';
+import ProfileScreen from './Screens/ProfileScreen';
+import MapScreen from './Screens/MapScreen';
+import ReservationsScreen from './Screens/ReservationsScreen';
+import RestaurantProfileScreen from './Screens/RestaurantProfileScreen';
+import UserProfileScreen from './Screens/UserProfileScreen';
+import { Ionicons, FontAwesome5, MaterialIcons, Entypo } from '@expo/vector-icons';
+import SplashScreen from './Screens/SplashScreen';
+const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-export default function MyTabs() {
+function MainTabs() {
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -18,29 +27,44 @@ export default function MyTabs() {
         tabBarInactiveTintColor: '#888',
         tabBarStyle: { backgroundColor: '#fff', borderTopColor: '#d4f3e3' },
         tabBarIcon: ({ color, size }) => {
-          if (route.name === 'mainHome') {
-            return <Ionicons name="home" size={size} color={color} />;
-          }
-          if (route.name === 'Reservations') {
-            return <Ionicons name="calendar" size={size} color={color} />;
-          }
-          if (route.name === 'Marketplace') {
-            return <Ionicons name="cart" size={size} color={color} />;
-          }
-          if (route.name === 'Profile') {
-            return <Ionicons name="person" size={size} color={color} />;
-          }
-          if (route.name === 'Map') {
-            // Changed to a modern pin icon
-            return <Ionicons name="location-sharp" size={size} color={color} />;
-          }
+          if (route.name === 'Home') return <Ionicons name="home" size={size} color={color} />;
+          if (route.name === 'Reservations') return <FontAwesome5 name="calendar-check" size={size} color={color} />;
+          if (route.name === 'Marketplace') return <MaterialIcons name="storefront" size={size} color={color} />;
+          if (route.name === 'Profile') return <Ionicons name="person-circle" size={size} color={color} />;
+          if (route.name === 'Map') return <Entypo name="map" size={size} color={color} />;
         },
-      })}>
-      <Tab.Screen name="mainHome" component={MainHomeScreen} />
+      })}
+    >
+      <Tab.Screen name="mainHome" component={HomeScreen} />
       <Tab.Screen name="Reservations" component={ReservationsScreen} />
       <Tab.Screen name="Marketplace" component={MarketplaceScreen} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
       <Tab.Screen name="Map" component={MapScreen} />
     </Tab.Navigator>
+  );
+}
+
+export default function App() {
+  const [showSplash, setShowSplash] = React.useState(true);
+
+  if (showSplash) {
+    return <SplashScreen onFinish={() => setShowSplash(false)} />;
+  }
+
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Welcome" screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="Welcome" component={WelcomeScreen} />
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Signup" component={SignupScreen} />
+        <Stack.Screen name="Home" component={MainTabs} />
+        <Stack.Screen name="PostDetail" component={PostDetailScreen} />
+        <Stack.Screen name="Reservations" component={ReservationsScreen} />
+        <Stack.Screen name="RestaurantProfile" component={RestaurantProfileScreen} />
+        <Stack.Screen name="UserProfile" component={UserProfileScreen} />
+        <Stack.Screen name="ChooseAccountType" component={ChooseAccountTypeScreen} />
+        <Stack.Screen name="RestaurantRegistration" component={RestaurantRegistrationScreen} />
+      </Stack.Navigator>
+    </NavigationContainer>
   );
 }

@@ -13,7 +13,7 @@ import {
 import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import RestaurantProfileScreen from './RestaurantProfileScreen'; // Make sure this exists
-import UserProfileScreen from './UserProfileScreen'; // You will create this below
+import UserProfileScreen from '../UserProfileScreen'; // You will create this below
 
 // Sample restaurant lists for horizontal scroll
 const restaurantLists = [
