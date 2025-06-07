@@ -1,28 +1,26 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from pydantic import BaseModel
-from typing import List
+from typing import Optional
+from app.dependencies.auth import verify_api_key
 from app.firebase.client import rtdb
 
 router = APIRouter()
 
-
-ratings_store = []
-
 class Rating(BaseModel):
-    restaurant_id: str
     user_id: str
-    rating: float  
-    comment: str = ""
+    rating: float
+    comment: Optional[str] = ""
 
-@router.post("/", status_code=201)
-def submit_rating(rating: Rating):
+@router.post("/{restaurant_id}")
+def rate_restaurant(restaurant_id: str, rating: Rating, user=Depends(verify_api_key)):
     if not (1.0 <= rating.rating <= 5.0):
         raise HTTPException(status_code=400, detail="Rating must be between 1.0 and 5.0")
+    ref = rtdb.child("restaurants").child(restaurant_id).child("ratings").push(rating.dict())
+    return {"message": "Rating submitted", "id": ref.key}
 
-    ratings_store.append(rating)
-    return {"message": "Rating submitted successfully", "rating": rating}
-
-@router.get("/{restaurant_id}", response_model=List[Rating])
-def get_ratings_for_restaurant(restaurant_id: str):
-    result = [r for r in ratings_store if r.restaurant_id == restaurant_id]
-    return result
+@router.get("/{restaurant_id}")
+def get_ratings(restaurant_id: str, user=Depends(verify_api_key)):
+    ratings = rtdb.child("restaurants").child(restaurant_id).child("ratings").get()
+    if not ratings:
+        return []
+    return list(ratings.val().values())
