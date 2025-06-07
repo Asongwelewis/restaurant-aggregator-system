@@ -15,6 +15,7 @@ def haversine(lat1, lon1, lat2, lon2):
 
 @router.get("/")
 def search_restaurants(
+    
     q: str = Query("", description="Search query"),
     lat: float = Query(None, description="Latitude"),
     lon: float = Query(None, description="Longitude"),
