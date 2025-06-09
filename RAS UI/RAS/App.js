@@ -2,22 +2,24 @@ import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import WelcomeScreen from './Screens/WelcomeScreen';
-import LoginScreen from './Screens/LoginScreen';
-import SignupScreen from './Screens/SignupScreen';
-import HomeScreen from './Screens/HomeScreen';
-import PostDetailScreen from './Screens/PostDetailScreen';
-import MarketplaceScreen from './Screens/MarketplaceScreen';
-import ProfileScreen from './Screens/ProfileScreen';
-import MapScreen from './Screens/MapScreen';
-import ReservationsScreen from './Screens/ReservationsScreen';
-import RestaurantProfileScreen from './Screens/RestaurantProfileScreen';
-import UserProfileScreen from './Screens/UserProfileScreen';
+import WelcomeScreen from './src/screens/WelcomeScreen';
+import LoginScreen from './src/screens/LoginScreen';
+import SignupScreen from './src/screens/SignupScreen';
+import HomeScreen from './src/screens/HomeScreen';
+import PostDetailScreen from './src/screens/PostDetailScreen';
+import MarketplaceScreen from './src/screens/MarketplaceScreen';
+import ProfileScreen from './src/screens/ProfileScreen';
+import MapScreen from './src/screens/MapScreen';
+import ReservationsScreen from './src/screens/ReservationsScreen';
+import RestaurantProfileScreen from './src/screens/RestaurantProfileScreen';
+import UserProfileScreen from './src/screens/UserProfileScreen';
 import { Ionicons, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
-import SplashScreen from './Screens/SplashScreen';
-import ChooseAccountTypeScreen from './Screens/ChooseAccountTypeScreen';
-import RestaurantRegistrationScreen from './Screens/RestaurantRegistrationScreen';
-import SearchScreen from './Screens/SearchScreen';
+import SplashScreen from './src/screens/SplashScreen';
+import ChooseAccountTypeScreen from './src/screens/ChooseAccountTypeScreen';
+import RestaurantRegistrationScreen from './src/screens/RestaurantRegistrationScreen';
+import SearchScreen from './src/screens/SearchScreen';
+import ShareScreen from './src/screens/ShareScreen';
+import HomeStack from './src/navigation/HomeStack';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -28,7 +30,22 @@ function MainTabs() {
         headerShown: false,
         tabBarActiveTintColor: '#27ae60',
         tabBarInactiveTintColor: '#888',
-        tabBarStyle: { backgroundColor: '#fff', borderTopColor: '#d4f3e3' },
+        tabBarStyle: {
+          backgroundColor: '#fff',
+          borderTopColor: '#d4f3e3',
+          borderTopWidth: 1,
+          borderTopLeftRadius: 28,   // <-- Add this
+          borderTopRightRadius: 28,  // <-- And this
+          position: 'absolute',      // <-- Required for border radius to show
+          left: 0,
+          right: 0,
+          bottom: 0,
+          elevation: 10,             // Optional: shadow for Android
+          shadowColor: '#000',       // Optional: shadow for iOS
+          shadowOpacity: 0.08,
+          shadowOffset: { width: 0, height: -2 },
+          shadowRadius: 8,
+        },
         tabBarIcon: ({ color, size }) => {
           if (route.name === 'Home') return <Ionicons name="home" size={size} color={color} />;
           if (route.name === 'Reservations') return <FontAwesome5 name="calendar-check" size={size} color={color} />;
@@ -38,7 +55,7 @@ function MainTabs() {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen name="Home" component={HomeStack} />
       <Tab.Screen name="Reservations" component={ReservationsScreen} />
       <Tab.Screen name="TransactionsAndDeliveries" component={MarketplaceScreen} options={{ title: 'Transactions & Deliveries' }} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
@@ -67,6 +84,8 @@ export default function App() {
         <Stack.Screen name="ChooseAccountType" component={ChooseAccountTypeScreen} />
         <Stack.Screen name="RestaurantRegistration" component={RestaurantRegistrationScreen} />
         <Stack.Screen name="Search" component={SearchScreen} />
+        <Stack.Screen name="Share" component={ShareScreen} />
+        
       </Stack.Navigator>
     </NavigationContainer>
   );
