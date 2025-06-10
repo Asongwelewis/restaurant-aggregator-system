@@ -10,10 +10,12 @@ import {
   Image,
   KeyboardAvoidingView,
   Platform,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons, FontAwesome, AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { BlurView } from 'expo-blur';
+import { signupUser } from '../api/signup'; // Add this import at the top
 
 const { width, height } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.9;
@@ -22,6 +24,11 @@ const CARD_HEIGHT = height * 0.7;
 export default function SignupScreen({ navigation, onClose }) {
   const cardScale = useRef(new Animated.Value(0.8)).current;
   const [image, setImage] = useState(null);
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     Animated.spring(cardScale, {
@@ -46,6 +53,25 @@ export default function SignupScreen({ navigation, onClose }) {
 
     if (!result.canceled) {
       setImage(result.assets[0].uri);
+    }
+  };
+
+  const handleSignup = async () => {
+    setError('');
+    if (!username || !email || !password) {
+      setError('Please fill all fields.');
+      return;
+    }
+    setLoading(true);
+    try {
+      await signupUser({ username, email, password, image });
+      setLoading(false);
+      if (navigation) {
+        navigation.replace('Login');
+      }
+    } catch (err) {
+      setLoading(false);
+      setError(err.message || 'Signup failed');
     }
   };
 
@@ -80,6 +106,8 @@ export default function SignupScreen({ navigation, onClose }) {
                 placeholder="Username"
                 placeholderTextColor="#b0b0b0"
                 autoCapitalize="none"
+                value={username}
+                onChangeText={setUsername}
               />
               <TextInput
                 style={styles.input}
@@ -87,21 +115,29 @@ export default function SignupScreen({ navigation, onClose }) {
                 placeholderTextColor="#b0b0b0"
                 keyboardType="email-address"
                 autoCapitalize="none"
+                value={email}
+                onChangeText={setEmail}
               />
               <TextInput
                 style={styles.input}
                 placeholder="Password"
                 placeholderTextColor="#b0b0b0"
                 secureTextEntry
+                value={password}
+                onChangeText={setPassword}
               />
             </View>
+            {error ? <Text style={styles.errorText}>{error}</Text> : null}
             <TouchableOpacity
               style={styles.signupButton}
-              onPress={() => {
-                // Handle sign up logic here
-              }}
+              onPress={handleSignup}
+              disabled={loading}
             >
-              <Text style={styles.signupButtonText}>Sign Up</Text>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.signupButtonText}>Sign Up</Text>
+              )}
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.loginLink}
@@ -307,5 +343,11 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginLeft: 6,
     fontSize: 15,
+  },
+  errorText: {
+    color: 'red',
+    fontSize: 14,
+    marginBottom: 10,
+    textAlign: 'center',
   },
 });
