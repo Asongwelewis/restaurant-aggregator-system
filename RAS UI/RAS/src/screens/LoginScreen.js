@@ -14,7 +14,7 @@ import {
 } from 'react-native';
 import { Ionicons, FontAwesome, AntDesign } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
-import { loginUser, saveTokens } from '../api/auth'; // <-- Import your login logic
+import { loginUser, saveTokens, unhashPassword } from '../api/auth'; // <-- Import unhashPassword
 
 const { width, height } = Dimensions.get('window');
 
@@ -40,12 +40,19 @@ export default function LoginScreen({ navigation, onClose }) {
     setError('');
     setLoading(true);
     try {
-      // Use your loginUser function (make sure it accepts username/email and password)
+      // Unhash password before sending (for demonstration only)
+      // In real apps, you never unhash passwords on client side!
+      // Here, we assume password is entered as plain text, so skip unhashing.
+      // If you want to simulate, you can hash and then unhash here:
+      // const hashed = hashPassword(password);
+      // const unhashed = unhashPassword(hashed);
+
+      // Use your loginUser function (now expects plain password, hashes inside)
       const tokens = await loginUser(username, password);
       await saveTokens(tokens);
       setLoading(false);
       Alert.alert('Login Successful', 'You have successfully logged in!');
-      if (navigation) navigation.replace('MainTabs');
+      if (navigation) navigation.replace('MainTabs'); // HomeScreen
     } catch (err) {
       setLoading(false);
       setError(err.message || 'Login failed');

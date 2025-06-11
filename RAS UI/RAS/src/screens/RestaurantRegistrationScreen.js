@@ -2,6 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Image, Button, Dimensions, Animated, KeyboardAvoidingView, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
+import { registerUser, saveTokens } from '../api/auth'; // <-- Use auth.js logic
 
 const { width, height } = Dimensions.get('window');
 
@@ -44,6 +45,8 @@ export default function RestaurantRegistrationScreen({ navigation }) {
   });
 
   const [showFAQ, setShowFAQ] = useState(false);
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   // Animation for card pop-in
   const cardScale = useRef(new Animated.Value(0.8)).current;
@@ -68,10 +71,22 @@ export default function RestaurantRegistrationScreen({ navigation }) {
 
   const handleChange = (key, value) => setForm({ ...form, [key]: value });
 
-  const handleSubmit = () => {
-    // Add your registration logic here
-    alert('Restaurant registered!');
-    navigation.navigate('mainHome');
+  const handleSubmit = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      // Use registerUser from auth.js (name, email, password)
+      const tokens = await registerUser(form.name, form.email, form.password);
+      if (tokens) {
+        await saveTokens(tokens);
+      }
+      setLoading(false);
+      alert('Restaurant registered!');
+      navigation.navigate('mainHome');
+    } catch (err) {
+      setLoading(false);
+      setError(err.message || 'Registration failed');
+    }
   };
 
   return (
@@ -126,7 +141,9 @@ export default function RestaurantRegistrationScreen({ navigation }) {
             </View>
             <TextInput style={styles.input} placeholder="Time Opened" value={form.timeOpened} onChangeText={v => handleChange('timeOpened', v)} />
 
-            <Button title="Register Restaurant" color="#27ae60" onPress={handleSubmit} />
+            {/* Replace the Button with loading/error feedback */}
+            <Button title={loading ? "Registering..." : "Register Restaurant"} color="#27ae60" onPress={handleSubmit} disabled={loading} />
+            {error ? <Text style={{ color: 'red', marginTop: 8 }}>{error}</Text> : null}
           </Animated.View>
 
           {/* FAQ Section */}

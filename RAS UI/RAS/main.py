@@ -9,6 +9,7 @@ from fastapi.requests import Request
 import os
 import httpx
 from dotenv import load_dotenv
+from fastapi.middleware.cors import CORSMiddleware
 
 
 load_dotenv()
@@ -24,6 +25,14 @@ app = FastAPI(
     description="Restaurant Aggregator System API",
     title="Restaurant Aggregator System",
     docs_url="/"
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 FIREBASE_API_KEY = os.getenv("FIREBASE_WEB_API_KEY")

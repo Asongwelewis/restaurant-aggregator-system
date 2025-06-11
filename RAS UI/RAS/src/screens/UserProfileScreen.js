@@ -1,20 +1,20 @@
 import React from 'react';
 import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import { useTheme } from '../context/ThemeContext';
 
 export default function UserProfileScreen({ route }) {
   const { user } = route.params;
+  const { darkMode } = useTheme();
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Image source={{ uri: user.profilePic }} style={styles.avatar} />
-      <Text style={styles.name}>{user.profileName}</Text>
-      <Text style={styles.intro}>{user.intro}</Text>
-      {/* Add more user info, posts, reviews, etc. here */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>About</Text>
-        <Text style={styles.sectionText}>
-          {/* Placeholder for user bio or more info */}
-          This is {user.profileName}'s profile. More info and user posts can be shown here.
+    <ScrollView contentContainerStyle={[styles.container, darkMode && { backgroundColor: '#181a1b' }]}>
+      <Image source={{ uri: user?.profilePic || 'https://randomuser.me/api/portraits/men/32.jpg' }} style={styles.avatar} />
+      <Text style={[styles.name, darkMode && { color: '#CAFF4E' }]}>{user?.profileName || user?.username || 'Guest'}</Text>
+      <Text style={[styles.intro, darkMode && { color: '#aaa' }]}>{user?.intro || user?.email || ''}</Text>
+      <View style={[styles.section, darkMode && { backgroundColor: '#232526' }]}>
+        <Text style={[styles.sectionTitle, darkMode && { color: '#CAFF4E' }]}>About</Text>
+        <Text style={[styles.sectionText, darkMode && { color: '#fff' }]}>
+          This is {user?.profileName || user?.username || 'Guest'}'s profile. More info and user posts can be shown here.
         </Text>
       </View>
     </ScrollView>

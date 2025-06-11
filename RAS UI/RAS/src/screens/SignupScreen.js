@@ -15,7 +15,7 @@ import {
 import { Ionicons, FontAwesome, AntDesign } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { BlurView } from 'expo-blur';
-import { signupUser } from '../api/signup'; // Add this import at the top
+import { registerUser, saveTokens } from '../api/auth'; // <-- Use auth.js logic
 
 const { width, height } = Dimensions.get('window');
 const CARD_WIDTH = width * 0.9;
@@ -64,7 +64,11 @@ export default function SignupScreen({ navigation, onClose }) {
     }
     setLoading(true);
     try {
-      await signupUser({ username, email, password, image });
+      // Use registerUser from auth.js (name, email, password)
+      const tokens = await registerUser(username, email, password);
+      if (tokens) {
+        await saveTokens(tokens);
+      }
       setLoading(false);
       if (navigation) {
         navigation.replace('Login');
