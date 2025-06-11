@@ -2,9 +2,9 @@ from fastapi import FastAPI, HTTPException, Header, Depends
 from pydantic import BaseModel, EmailStr
 import firebase_admin
 from firebase_admin import credentials, auth, db
-from cachetools import TTLCache
-from starlette.middleware.base import BaseHTTPMiddleware
-from starlette.status import HTTP_429_TOO_MANY_REQUESTS
+#from cachetools import TTLCache
+#from starlette.middleware.base import BaseHTTPMiddleware
+#from starlette.status import HTTP_429_TOO_MANY_REQUESTS
 from fastapi.requests import Request
 from fastapi import UploadFile, File
 import os
@@ -43,26 +43,26 @@ FIREBASE_API_KEY = os.getenv("FIREBASE_WEB_API_KEY")
 # ---------------------
 # Rate Limiting Middleware
 # ---------------------
-RATE_LIMIT = 5
-WINDOW_SECONDS = 60
-ip_cache = TTLCache(maxsize=10000, ttl=WINDOW_SECONDS)
+# RATE_LIMIT = 5
+# WINDOW_SECONDS = 60
+# ip_cache = TTLCache(maxsize=10000, ttl=WINDOW_SECONDS)
 
-class RateLimitMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        ip = request.client.host
-        count = ip_cache.get(ip, 0)
+# class RateLimitMiddleware(BaseHTTPMiddleware):
+#     async def dispatch(self, request: Request, call_next):
+#         ip = request.client.host
+#         count = ip_cache.get(ip, 0)
 
-        if count >= RATE_LIMIT:
-            raise HTTPException(
-                status_code=HTTP_429_TOO_MANY_REQUESTS,
-                detail="Rate limit exceeded"
-            )
+#         if count >= RATE_LIMIT:
+#             raise HTTPException(
+#                 status_code=HTTP_429_TOO_MANY_REQUESTS,
+#                 detail="Rate limit exceeded"
+#             )
 
-        ip_cache[ip] = count + 1
-        response = await call_next(request)
-        return response
+#         ip_cache[ip] = count + 1
+#         response = await call_next(request)
+#         return response
 
-app.add_middleware(RateLimitMiddleware)
+# app.add_middleware(RateLimitMiddleware)
 
 # ---------------------
 # Models
