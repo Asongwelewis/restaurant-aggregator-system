@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, TextInput } from 'react-native';
+import { View, Text, StyleSheet, FlatList, TouchableOpacity, SafeAreaView, TextInput, ScrollView } from 'react-native';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 const MOCK_RESERVATIONS = [
@@ -22,7 +22,8 @@ const FILTERS = [
   { key: 'cancelled', label: 'Cancelled' },
 ];
 
-export default function ReservationsScreen() {
+export default function ReservationsScreen(props) {
+  const { darkMode } = props; // or from context
   const [activeTab, setActiveTab] = useState('reservations');
   const [activeFilter, setActiveFilter] = useState('all');
   const [search, setSearch] = useState('');
@@ -155,8 +156,6 @@ export default function ReservationsScreen() {
     </SafeAreaView>
   );
 }
-
-import { ScrollView } from 'react-native-gesture-handler';
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#eafaf1', paddingTop: 16 },

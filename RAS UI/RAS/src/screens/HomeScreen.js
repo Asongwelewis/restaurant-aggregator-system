@@ -172,12 +172,12 @@ const FILTERS = [
   { key: 'dessert', label: 'Dessert', icon: <MaterialCommunityIcons name="cupcake" size={22} color="#d35400" /> },
 ];
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen({ navigation, ...props }) {
   const [posts, setPosts] = useState(generatePosts());
   const [composerText, setComposerText] = useState('');
   const [likedPosts, setLikedPosts] = useState({});
   const [activeFilter, setActiveFilter] = useState('all');
-  const { darkMode } = useTheme();
+  const { darkMode } = props;
   const [userProfile, setUserProfile] = useState(null);
 
   // Fetch user profile from AsyncStorage or API

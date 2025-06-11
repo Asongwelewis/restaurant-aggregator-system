@@ -26,7 +26,9 @@ const restaurants = [
   // Add more restaurants as needed
 ];
 
-export default function MapScreen({ navigation }) {
+export default function MapScreen({ navigation, ...props }) {
+  const { darkMode } = props; // or from context
+
   return (
     <View style={styles.container}>
       <MapView

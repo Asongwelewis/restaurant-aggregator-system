@@ -14,7 +14,7 @@ const LANGUAGES = [
   { code: 'de', label: 'Deutsch' },
 ];
 
-export default function ProfileScreen() {
+export default function ProfileScreen(props) {
   const { darkMode, setDarkMode } = useTheme();
   const theme = darkMode ? darkStyles : styles;
 
