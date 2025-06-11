@@ -120,6 +120,7 @@ def login_with_email_password(email: str, password: str):
         "password": password,
         "returnSecureToken": True
     }
+    
     response = requests.post(url, json=payload)
     if response.status_code != 200:
         raise HTTPException(status_code=401, detail="Invalid credentials")
