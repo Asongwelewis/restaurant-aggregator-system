@@ -4,14 +4,13 @@ import { BASE_URL } from './config';
 // Registers a new user
 export async function signupUser({ username, email, password, image }) {
   try {
-    const payload = { username, email, password };
+    const payload = { name: username, email, password }; // Use 'name'
     if (image) payload.image = image;
-    const response = await axios.post(`${BASE_URL}/auth/register`, payload);
-    // Adjust the endpoint and payload as per your backend API
+    const response = await axios.post(`${BASE_URL}/register`, payload); // Use /register
     return response.data;
   } catch (error) {
     throw new Error(
-      error.response?.data?.message ||
+      error.response?.data?.detail ||
       error.message ||
       'Signup failed'
     );

@@ -1,1 +1,1 @@
-export const BASE_URL = 'http://localhost:8000'; // Change to your backend URL if needed
+export const BASE_URL = 'http://127.0.0.1:8000'; // Change to your backend URL if needed
