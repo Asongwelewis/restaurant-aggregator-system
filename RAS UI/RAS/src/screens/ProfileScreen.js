@@ -15,7 +15,15 @@ const LANGUAGES = [
 ];
 
 export default function ProfileScreen(props) {
-  const { darkMode, setDarkMode } = useTheme();
+  // Add fallback for useTheme
+  let themeContext;
+  try {
+    themeContext = useTheme();
+  } catch {
+    themeContext = {};
+  }
+  const darkMode = themeContext?.darkMode ?? false;
+  const setDarkMode = themeContext?.setDarkMode ?? (() => {});
   const theme = darkMode ? darkStyles : styles;
 
   const [user, setUser] = useState(null);
@@ -37,57 +45,20 @@ export default function ProfileScreen(props) {
       try {
         const tokens = await AsyncStorage.getItem('authTokens');
         if (!tokens) throw new Error('No authentication token found.');
-        const { access } = JSON.parse(tokens);
+        // Parse tokens and get id_token (not access)
+        const parsedTokens = JSON.parse(tokens);
+        const idToken = parsedTokens.id_token || parsedTokens.idToken || parsedTokens.access || parsedTokens.token;
+        if (!idToken) throw new Error('No id_token found in stored tokens.');
 
-        // Try more possible endpoints for user profile
-        const endpoints = [
-          '/api/user/me/',
-          '/api/user/me',
-          '/api/users/me/',
-          '/api/users/me',
-          '/api/profile/',
-          '/api/profile',
-          '/users/me/',
-          '/users/me',
-          '/user/me/',
-          '/user/me',
-          '/me/',
-          '/me',
-          '/auth/me/',
-          '/auth/me'
-        ];
-        let res = null;
-        let lastError = null;
-        let successfulEndpoint = null;
-        for (let endpoint of endpoints) {
-          try {
-            console.log('Trying endpoint:', `${BASE_URL}${endpoint}`);
-            res = await axios.get(`${BASE_URL}${endpoint}`, {
-              headers: { Authorization: `Bearer ${access}` }
-            });
-            if (res && res.data) {
-              successfulEndpoint = endpoint;
-              break;
-            }
-          } catch (err) {
-            console.log(
-              'Profile fetch error:',
-              'Status:', err?.response?.status,
-              'Data:', err?.response?.data,
-              'Message:', err.message
-            );
-            if (err?.response?.status === 500) {
-              console.log('HINT: Check your backend logs for the real error causing the 500 Internal Server Error.');
-            }
-            lastError = err;
-          }
-        }
-        if (!res || !res.data) {
-          throw lastError || new Error('No valid user endpoint found.');
-        }
-        if (successfulEndpoint) {
-          console.log('SUCCESS: User profile fetched from endpoint:', `${BASE_URL}${successfulEndpoint}`);
-        }
+        console.log('idToken being sent:', idToken);
+
+        // Use the correct endpoint and header
+        const endpoint = '/auth/profile';
+        console.log('Trying endpoint:', `${BASE_URL}${endpoint}`);
+        const res = await axios.get(`${BASE_URL}${endpoint}`, {
+          headers: { 'id-token': idToken }
+        });
+
         setUser(res.data);
         setPhone(res.data.phone || '');
         setBio(res.data.bio || '');
