@@ -373,7 +373,10 @@ export default function HomeScreen({ navigation }) {
           value={composerText}
           onChangeText={setComposerText}
         />
-        <TouchableOpacity style={styles.composerBtn}>
+        <TouchableOpacity
+          style={styles.composerBtn}
+          onPress={() => navigation.navigate('Share')}
+        >
           <FontAwesome name="send" size={20} color="#fff" />
         </TouchableOpacity>
       </View>

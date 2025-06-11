@@ -58,6 +58,20 @@ This project is a restaurant aggregator platform with a React Native (Expo) mobi
 - Make sure your phone and computer are on the same Wi-Fi for Expo Go.
 - Backend API runs by default at `http://localhost:8000`.
 
+## Structure
+
+src/
+├── api/                  # Frontend API calls
+│   ├── auth.js           # Authentication-related API calls (login, signup)
+│   ├── restaurants.js    # Restaurant-related API calls (list, search)
+│   ├── bookings.js       # Booking-related API calls
+│   ├── payments.js       # Payment-related API calls
+│   └── index.js          # Optional: central export file
+├── components/           # UI components (Alex’s work)
+├── screens/              # Screens mapped to user stories
+├── navigation/           # Navigation setup
+└── utils/                # Utility functions/helpers
+
 ---
 
 For more details, see the code in [RAS UI/RAS/App.js](RAS%20UI/RAS/App.js) and backend routers in [backend/app/routers/](../backend/app/routers/).
