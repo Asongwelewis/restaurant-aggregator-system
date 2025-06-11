@@ -2,6 +2,24 @@ import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
+<<<<<<< HEAD:App.js
+import WelcomeScreen from './Screens/WelcomeScreen';
+import LoginScreen from './Screens/LoginScreen';
+import SignupScreen from './Screens/SignupScreen';
+import HomeScreen from './Screens/HomeScreen';
+import PostDetailScreen from './Screens/PostDetailScreen';
+import MarketplaceScreen from './Screens/MarketplaceScreen';
+import ProfileScreen from './Screens/ProfileScreen';
+import MapScreen from './Screens/MapScreen';
+import ReservationsScreen from './Screens/ReservationsScreen';
+import RestaurantProfileScreen from './Screens/RestaurantProfileScreen';
+import UserProfileScreen from './Screens/UserProfileScreen';
+import { Ionicons, FontAwesome5, MaterialIcons } from '@expo/vector-icons';
+import SplashScreen from './Screens/SplashScreen';
+import ChooseAccountTypeScreen from './Screens/ChooseAccountTypeScreen';
+import RestaurantRegistrationScreen from './Screens/RestaurantRegistrationScreen';
+import SearchScreen from './Screens/SearchScreen';
+=======
 import WelcomeScreen from './src/screens/WelcomeScreen';
 import LoginScreen from './src/screens/LoginScreen';
 import SignupScreen from './src/screens/SignupScreen';
@@ -20,6 +38,7 @@ import RestaurantRegistrationScreen from './src/screens/RestaurantRegistrationSc
 import SearchScreen from './src/screens/SearchScreen';
 import ShareScreen from './src/screens/ShareScreen';
 import HomeStack from './src/navigation/HomeStack';
+>>>>>>> 9a2a379299334d60cb15ab4858c7c74334d277b6:RAS UI/RAS/App.js
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
@@ -55,7 +74,11 @@ function MainTabs() {
         },
       })}
     >
+<<<<<<< HEAD:App.js
+      <Tab.Screen name="Home" component={HomeScreen} />
+=======
       <Tab.Screen name="Home" component={HomeStack} />
+>>>>>>> 9a2a379299334d60cb15ab4858c7c74334d277b6:RAS UI/RAS/App.js
       <Tab.Screen name="Reservations" component={ReservationsScreen} />
       <Tab.Screen name="TransactionsAndDeliveries" component={MarketplaceScreen} options={{ title: 'Transactions & Deliveries' }} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
@@ -84,8 +107,11 @@ export default function App() {
         <Stack.Screen name="ChooseAccountType" component={ChooseAccountTypeScreen} />
         <Stack.Screen name="RestaurantRegistration" component={RestaurantRegistrationScreen} />
         <Stack.Screen name="Search" component={SearchScreen} />
+<<<<<<< HEAD:App.js
+=======
         <Stack.Screen name="Share" component={ShareScreen} />
         
+>>>>>>> 9a2a379299334d60cb15ab4858c7c74334d277b6:RAS UI/RAS/App.js
       </Stack.Navigator>
     </NavigationContainer>
   );

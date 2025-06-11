@@ -23,8 +23,12 @@
     "react-native": "0.79.3",
     "react-native-maps": "^1.20.1",
     "react-native-safe-area-context": "^5.4.0",
+<<<<<<< HEAD:package.json
+    "react-native-screens": "~4.11.1"
+=======
     "react-native-screens": "~4.11.1",
     "react-scripts": "^5.0.1"
+>>>>>>> 9a2a379299334d60cb15ab4858c7c74334d277b6:RAS UI/RAS/package.json
   },
   "devDependencies": {
     "@babel/core": "^7.26.0"

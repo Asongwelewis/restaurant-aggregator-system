@@ -9,9 +9,12 @@ import {
   Dimensions,
   KeyboardAvoidingView,
   Platform,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons, FontAwesome, AntDesign } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+import { loginUser, saveTokens, unhashPassword } from '../api/auth'; // <-- Import unhashPassword
 
 const { width, height } = Dimensions.get('window');
 
@@ -19,6 +22,8 @@ export default function LoginScreen({ navigation, onClose }) {
   const cardScale = useRef(new Animated.Value(0.8)).current;
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     Animated.spring(cardScale, {
@@ -28,7 +33,31 @@ export default function LoginScreen({ navigation, onClose }) {
     }).start();
   }, []);
 
-  const isLoginDisabled = !username || !password;
+  const isLoginDisabled = !username || !password || loading;
+
+  // --- LOGIN HANDLER ---
+  const handleLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      // Unhash password before sending (for demonstration only)
+      // In real apps, you never unhash passwords on client side!
+      // Here, we assume password is entered as plain text, so skip unhashing.
+      // If you want to simulate, you can hash and then unhash here:
+      // const hashed = hashPassword(password);
+      // const unhashed = unhashPassword(hashed);
+
+      // Use your loginUser function (now expects plain password, hashes inside)
+      const tokens = await loginUser(username, password);
+      await saveTokens(tokens);
+      setLoading(false);
+      Alert.alert('Login Successful', 'You have successfully logged in!');
+      if (navigation) navigation.replace('MainTabs'); // HomeScreen
+    } catch (err) {
+      setLoading(false);
+      setError(err.message || 'Login failed');
+    }
+  };
 
   return (
     <View style={styles.bg}>
@@ -52,7 +81,7 @@ export default function LoginScreen({ navigation, onClose }) {
             <View style={styles.inputGroup}>
               <TextInput
                 style={styles.input}
-                placeholder="Username or Number"
+                placeholder="Username or Email"
                 placeholderTextColor="#b0b0b0"
                 value={username}
                 onChangeText={setUsername}
@@ -67,22 +96,25 @@ export default function LoginScreen({ navigation, onClose }) {
                 onChangeText={setPassword}
               />
             </View>
+            {error ? <Text style={{ color: 'red', marginBottom: 8 }}>{error}</Text> : null}
             <TouchableOpacity
               style={[
                 styles.loginButton,
                 isLoginDisabled && { backgroundColor: '#e0e0e0aa' },
               ]}
-              onPress={() => {
-                // Handle login logic here
-              }}
+              onPress={handleLogin}
               disabled={isLoginDisabled}
             >
-              <Text style={[
-                styles.loginButtonText,
-                isLoginDisabled && { color: '#b0b0b0' }
-              ]}>
-                Login
-              </Text>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={[
+                  styles.loginButtonText,
+                  isLoginDisabled && { color: '#b0b0b0' }
+                ]}>
+                  Login
+                </Text>
+              )}
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.signupLink}

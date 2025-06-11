@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "Odis",
+    "slug": "FoodDelivery",
+    "icon": "./assets/icon.png",
+    "version": "1.0.0",
+    "sdkVersion": "53.0.0",
+    "android": {
+      "package": "com.anonymous.RAS"
+    }
+  }
+}
