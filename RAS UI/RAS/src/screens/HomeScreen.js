@@ -394,13 +394,8 @@ export default function HomeScreen({ navigation }) {
   return (
     <SafeAreaView style={[styles.container, darkMode && { backgroundColor: '#181a1b' }]}>
       {/* Header */}
-<<<<<<<< HEAD:src/screens/HomeScreen.js
       <View style={[styles.header, darkMode && { backgroundColor: '#232526', borderBottomColor: '#333' }]}>
         <Text style={[styles.headerTitle, darkMode && { color: '#CAFF4E' }]}>oodis</Text>
-========
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>oodis</Text>
->>>>>>>> 9a2a379299334d60cb15ab4858c7c74334d277b6:src/screens/src/screens/HomeScreen.js
         <TouchableOpacity onPress={() => navigation.navigate('Search')}>
           <Ionicons name="search" size={28} color="#27ae60" />
         </TouchableOpacity>
@@ -437,8 +432,6 @@ export default function HomeScreen({ navigation }) {
         </ScrollView>
       </View>
 
-<<<<<<<< HEAD:src/screens/HomeScreen.js
-========
       {/* Composer */}
       <View style={styles.composer}>
         <Ionicons name="restaurant" size={32} color="#27ae60" />
@@ -456,7 +449,6 @@ export default function HomeScreen({ navigation }) {
         </TouchableOpacity>
       </View>
 
->>>>>>>> 9a2a379299334d60cb15ab4858c7c74334d277b6:src/screens/src/screens/HomeScreen.js
       {/* Feed */}
       <FlatList
         data={filteredPosts}
