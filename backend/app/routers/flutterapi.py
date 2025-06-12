@@ -1,5 +1,5 @@
 from app.models import flutterpay_request
-from helper_function import initialise_payment
+from app.helper_function import initialise_payment
 from fastapi import FastAPI
 
 app = FastAPI(    
