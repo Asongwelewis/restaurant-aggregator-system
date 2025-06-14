@@ -19,11 +19,32 @@ import ChooseAccountTypeScreen from './src/screens/ChooseAccountTypeScreen';
 import RestaurantRegistrationScreen from './src/screens/RestaurantRegistrationScreen';
 import SearchScreen from './src/screens/SearchScreen';
 import ShareScreen from './src/screens/ShareScreen';
+import RestaurantHomeScreen from './src/screens/RestaurantHomeScreen';
 import HomeStack from './src/navigation/HomeStack';
 const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 
-function MainTabs() {
+function MainTabs({ route }) {
+  // Determine user type (restaurant or normal user)
+  // Try to get from route.params or AsyncStorage
+  const [userType, setUserType] = React.useState(null);
+  React.useEffect(() => {
+    async function fetchUserType() {
+      let type = null;
+      if (route && route.params && route.params.userType) {
+        type = route.params.userType;
+      } else {
+        try {
+          const tokens = await AsyncStorage.getItem('authTokens');
+          const user = tokens ? JSON.parse(tokens).user : null;
+          type = user?.type || null;
+        } catch (e) { type = null; }
+      }
+      setUserType(type);
+    }
+    fetchUserType();
+  }, [route]);
+
   return (
     <Tab.Navigator
       screenOptions={({ route }) => ({
@@ -55,7 +76,11 @@ function MainTabs() {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
+      <Tab.Screen
+        name="Home"
+        component={userType === 'restaurant' ? RestaurantHomeScreen : HomeScreen}
+        options={{ title: 'Home' }}
+      />
       <Tab.Screen name="Reservations" component={ReservationsScreen} />
       <Tab.Screen name="TransactionsAndDeliveries" component={MarketplaceScreen} options={{ title: 'Transactions & Deliveries' }} />
       <Tab.Screen name="Profile" component={ProfileScreen} />

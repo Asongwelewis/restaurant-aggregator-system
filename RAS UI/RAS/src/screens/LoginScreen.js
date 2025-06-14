@@ -12,9 +12,10 @@ import {
   Alert,
   ActivityIndicator,
 } from 'react-native';
-import { Ionicons, FontAwesome, AntDesign } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
 import { loginUser, saveTokens, unhashPassword } from '../api/auth'; // <-- Import unhashPassword
+import GoogleAuthButton from '../components/GoogleAuthButton';
 
 const { width, height } = Dimensions.get('window');
 
@@ -40,19 +41,13 @@ export default function LoginScreen({ navigation, onClose }) {
     setError('');
     setLoading(true);
     try {
-      // Unhash password before sending (for demonstration only)
-      // In real apps, you never unhash passwords on client side!
-      // Here, we assume password is entered as plain text, so skip unhashing.
-      // If you want to simulate, you can hash and then unhash here:
-      // const hashed = hashPassword(password);
-      // const unhashed = unhashPassword(hashed);
-
-      // Use your loginUser function (now expects plain password, hashes inside)
       const tokens = await loginUser(username, password);
       await saveTokens(tokens);
       setLoading(false);
       Alert.alert('Login Successful', 'You have successfully logged in!');
-      if (navigation) navigation.replace('MainTabs'); // HomeScreen
+      // Check user type and navigate accordingly
+      const userType = tokens?.user?.type || null;
+      if (navigation) navigation.replace('MainTabs', userType ? { userType } : undefined);
     } catch (err) {
       setLoading(false);
       setError(err.message || 'Login failed');
@@ -130,15 +125,7 @@ export default function LoginScreen({ navigation, onClose }) {
               <View style={styles.divider} />
             </View>
             <View style={styles.socialRow}>
-              <TouchableOpacity style={styles.socialButton}>
-                <AntDesign name="google" size={24} color="#db4437" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.socialButton}>
-                <FontAwesome name="facebook" size={24} color="#4267B2" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.socialButton}>
-                <AntDesign name="apple1" size={24} color="#222" />
-              </TouchableOpacity>
+              <GoogleAuthButton style={{ flex: 1, minWidth: 180, maxWidth: '100%', alignSelf: 'center', paddingVertical: 8, backgroundColor: '#fff', borderRadius: 24, elevation: 2 }} />
             </View>
           </BlurView>
         </Animated.View>
@@ -261,15 +248,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
     marginTop: 6,
-  },
-  socialButton: {
-    backgroundColor: 'rgba(241,243,246,0.7)',
-    borderRadius: 50,
-    padding: 13,
-    marginHorizontal: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 1,
   },
   closeButton: {
     position: 'absolute',

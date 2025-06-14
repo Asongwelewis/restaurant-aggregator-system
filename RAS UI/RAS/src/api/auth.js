@@ -34,9 +34,9 @@ export async function loginUser(email, password) {
 /**
  * Registers a new user.
  */
-export async function registerUser(name, email, password) {
+export async function registerUser(name, email, password, type = 'user') {
   try {
-    const response = await axios.post(`${BASE_URL}/register`, { name, email, password });
+    const response = await axios.post(`${BASE_URL}/user/register`, { name, email, password, type });
     return response.data;
   } catch (error) {
     throw new Error(error.response?.data?.detail || 'Registration failed');
@@ -48,5 +48,15 @@ export async function saveTokens(tokens) {
     await AsyncStorage.setItem('authTokens', JSON.stringify(tokens));
   } catch (e) {
     console.log('Error saving tokens:', e);
+  }
+}
+
+export async function getUserType() {
+  try {
+    const tokens = await AsyncStorage.getItem('authTokens');
+    const user = tokens ? JSON.parse(tokens).user : null;
+    return user?.type || null;
+  } catch (e) {
+    return null;
   }
 }

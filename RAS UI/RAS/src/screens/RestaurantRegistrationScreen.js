@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { View, Text, TextInput, StyleSheet, ScrollView, TouchableOpacity, Image, Button, Dimensions, Animated, KeyboardAvoidingView, Platform } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons, MaterialIcons } from '@expo/vector-icons';
-import { registerUser, saveTokens } from '../api/auth'; // <-- Use auth.js logic
+import { registerUser } from '../api/auth'; // <-- Use auth.js logic
 
 const { width, height } = Dimensions.get('window');
 
@@ -75,14 +75,11 @@ export default function RestaurantRegistrationScreen({ navigation }) {
     setError('');
     setLoading(true);
     try {
-      // Use registerUser from auth.js (name, email, password)
-      const tokens = await registerUser(form.name, form.email, form.password);
-      if (tokens) {
-        await saveTokens(tokens);
-      }
+      // Use registerUser from auth.js (name, email, password, type)
+      await registerUser(form.name, form.email, form.password, 'restaurant');
       setLoading(false);
-      alert('Restaurant registered!');
-      navigation.navigate('mainHome');
+      alert('Restaurant registered! Please log in.');
+      navigation.navigate('Login');
     } catch (err) {
       setLoading(false);
       setError(err.message || 'Registration failed');
