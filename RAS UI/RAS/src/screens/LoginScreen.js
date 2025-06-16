@@ -9,9 +9,13 @@ import {
   Dimensions,
   KeyboardAvoidingView,
   Platform,
+  Alert,
+  ActivityIndicator,
 } from 'react-native';
-import { Ionicons, FontAwesome, AntDesign } from '@expo/vector-icons';
+import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
+import { loginUser, saveTokens, unhashPassword } from '../api/auth'; // <-- Import unhashPassword
+import GoogleAuthButton from '../components/GoogleAuthButton';
 
 const { width, height } = Dimensions.get('window');
 
@@ -19,6 +23,8 @@ export default function LoginScreen({ navigation, onClose }) {
   const cardScale = useRef(new Animated.Value(0.8)).current;
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     Animated.spring(cardScale, {
@@ -28,7 +34,25 @@ export default function LoginScreen({ navigation, onClose }) {
     }).start();
   }, []);
 
-  const isLoginDisabled = !username || !password;
+  const isLoginDisabled = !username || !password || loading;
+
+  // --- LOGIN HANDLER ---
+  const handleLogin = async () => {
+    setError('');
+    setLoading(true);
+    try {
+      const tokens = await loginUser(username, password);
+      await saveTokens(tokens);
+      setLoading(false);
+      Alert.alert('Login Successful', 'You have successfully logged in!');
+      // Check user type and navigate accordingly
+      const userType = tokens?.user?.type || null;
+      if (navigation) navigation.replace('MainTabs', userType ? { userType } : undefined);
+    } catch (err) {
+      setLoading(false);
+      setError(err.message || 'Login failed');
+    }
+  };
 
   return (
     <View style={styles.bg}>
@@ -52,7 +76,7 @@ export default function LoginScreen({ navigation, onClose }) {
             <View style={styles.inputGroup}>
               <TextInput
                 style={styles.input}
-                placeholder="Username or Number"
+                placeholder="Username or Email"
                 placeholderTextColor="#b0b0b0"
                 value={username}
                 onChangeText={setUsername}
@@ -67,22 +91,25 @@ export default function LoginScreen({ navigation, onClose }) {
                 onChangeText={setPassword}
               />
             </View>
+            {error ? <Text style={{ color: 'red', marginBottom: 8 }}>{error}</Text> : null}
             <TouchableOpacity
               style={[
                 styles.loginButton,
                 isLoginDisabled && { backgroundColor: '#e0e0e0aa' },
               ]}
-              onPress={() => {
-                // Handle login logic here
-              }}
+              onPress={handleLogin}
               disabled={isLoginDisabled}
             >
-              <Text style={[
-                styles.loginButtonText,
-                isLoginDisabled && { color: '#b0b0b0' }
-              ]}>
-                Login
-              </Text>
+              {loading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={[
+                  styles.loginButtonText,
+                  isLoginDisabled && { color: '#b0b0b0' }
+                ]}>
+                  Login
+                </Text>
+              )}
             </TouchableOpacity>
             <TouchableOpacity
               style={styles.signupLink}
@@ -98,15 +125,7 @@ export default function LoginScreen({ navigation, onClose }) {
               <View style={styles.divider} />
             </View>
             <View style={styles.socialRow}>
-              <TouchableOpacity style={styles.socialButton}>
-                <AntDesign name="google" size={24} color="#db4437" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.socialButton}>
-                <FontAwesome name="facebook" size={24} color="#4267B2" />
-              </TouchableOpacity>
-              <TouchableOpacity style={styles.socialButton}>
-                <AntDesign name="apple1" size={24} color="#222" />
-              </TouchableOpacity>
+              <GoogleAuthButton style={{ flex: 1, minWidth: 180, maxWidth: '100%', alignSelf: 'center', paddingVertical: 8, backgroundColor: '#fff', borderRadius: 24, elevation: 2 }} />
             </View>
           </BlurView>
         </Animated.View>
@@ -229,15 +248,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     width: '100%',
     marginTop: 6,
-  },
-  socialButton: {
-    backgroundColor: 'rgba(241,243,246,0.7)',
-    borderRadius: 50,
-    padding: 13,
-    marginHorizontal: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    elevation: 1,
   },
   closeButton: {
     position: 'absolute',

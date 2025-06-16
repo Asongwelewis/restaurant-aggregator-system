@@ -12,18 +12,27 @@
     "test": "echo \"No tests configured\" && exit 0"
   },
   "dependencies": {
+    "@react-native-async-storage/async-storage": "^2.1.2",
+    "@react-native-firebase/app": "^22.2.1",
+    "@react-native-firebase/auth": "^22.2.1",
     "@react-navigation/bottom-tabs": "^7.3.13",
     "@react-navigation/native": "^7.1.9",
     "@react-navigation/stack": "^7.3.2",
+    "@react-oauth/google": "^0.12.2",
+    "axios": "^1.9.0",
     "expo": "~53.0.10",
+    "expo-auth-session": "^6.2.0",
     "expo-blur": "~14.1.5",
     "expo-image-picker": "~16.1.4",
     "expo-status-bar": "~2.2.3",
+    "firebase": "^11.9.1",
     "react": "19.0.0",
     "react-native": "0.79.3",
+    "react-native-gesture-handler": "~2.24.0",
     "react-native-maps": "^1.20.1",
     "react-native-safe-area-context": "^5.4.0",
     "react-native-screens": "~4.11.1",
+    "react-native-web": "^0.20.0",
     "react-scripts": "^5.0.1"
   },
   "devDependencies": {

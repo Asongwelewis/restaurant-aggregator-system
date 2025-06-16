@@ -21,7 +21,8 @@ const MOCK_DELIVERIES = [
   { id: 'd3', item: 'Cake', address: '789 Sweet Rd', date: '2025-06-05', status: 'delivered' },
 ];
 
-export default function MarketplaceScreen() {
+export default function MarketplaceScreen(props) {
+  const { darkMode } = props; // or from context
   const [activeTab, setActiveTab] = useState('transactions');
   const [search, setSearch] = useState('');
 

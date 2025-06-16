@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   View,
   Text,
@@ -14,6 +14,8 @@ import { Ionicons, FontAwesome } from '@expo/vector-icons';
 import { MaterialCommunityIcons, FontAwesome5 } from '@expo/vector-icons';
 import RestaurantProfileScreen from './RestaurantProfileScreen'; // Make sure this exists
 import UserProfileScreen from './UserProfileScreen'; // You will create this below
+import { useTheme } from '../context/ThemeContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Sample restaurant lists for horizontal scroll
 const restaurantLists = [
@@ -170,11 +172,27 @@ const FILTERS = [
   { key: 'dessert', label: 'Dessert', icon: <MaterialCommunityIcons name="cupcake" size={22} color="#d35400" /> },
 ];
 
-export default function HomeScreen({ navigation }) {
+export default function HomeScreen({ navigation, ...props }) {
   const [posts, setPosts] = useState(generatePosts());
   const [composerText, setComposerText] = useState('');
   const [likedPosts, setLikedPosts] = useState({});
   const [activeFilter, setActiveFilter] = useState('all');
+  const { darkMode } = props;
+  const [userProfile, setUserProfile] = useState(null);
+
+  // Fetch user profile from AsyncStorage or API
+  useEffect(() => {
+    async function fetchProfile() {
+      try {
+        const tokens = await AsyncStorage.getItem('authTokens');
+        const user = tokens ? JSON.parse(tokens).user : null;
+        setUserProfile(user);
+      } catch (e) {
+        setUserProfile(null);
+      }
+    }
+    fetchProfile();
+  }, []);
 
   const renderStars = (count) => (
     <View style={{ flexDirection: 'row', marginTop: 2 }}>
@@ -330,18 +348,64 @@ export default function HomeScreen({ navigation }) {
     return true;
   });
 
+  // Layout for profile and composer
+  const renderProfileAndComposer = () => (
+    <View style={[
+      styles.profileComposerRow,
+      darkMode && { backgroundColor: '#232526' }
+    ]}>
+      <TouchableOpacity
+        style={[styles.profileSummary, darkMode && { backgroundColor: '#181a1b' }]}
+        onPress={() => navigation.navigate('UserProfile', { user: userProfile })}
+        disabled={!userProfile}
+      >
+        <Image
+          source={{ uri: userProfile?.profilePic || 'https://randomuser.me/api/portraits/men/32.jpg' }}
+          style={styles.profilePicLarge}
+        />
+        <View>
+          <Text style={[styles.profileNameLarge, darkMode && { color: '#fff' }]}>
+            {userProfile?.profileName || userProfile?.username || 'Guest'}
+          </Text>
+          <Text style={[styles.profileIntro, darkMode && { color: '#aaa' }]}>
+            {userProfile?.intro || userProfile?.email || ''}
+          </Text>
+        </View>
+      </TouchableOpacity>
+      <View style={[styles.composer, darkMode && { backgroundColor: '#232526' }]}>
+        <Ionicons name="restaurant" size={32} color="#27ae60" />
+        <TextInput
+          style={[styles.composerInput, darkMode && { color: '#fff', backgroundColor: '#181a1b' }]}
+          placeholder="Share a new dish or review..."
+          placeholderTextColor={darkMode ? "#aaa" : "#888"}
+          value={composerText}
+          onChangeText={setComposerText}
+        />
+        <TouchableOpacity
+          style={styles.composerBtn}
+          onPress={() => navigation.navigate('Share')}
+        >
+          <FontAwesome name="send" size={20} color="#fff" />
+        </TouchableOpacity>
+      </View>
+    </View>
+  );
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, darkMode && { backgroundColor: '#181a1b' }]}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>oodis</Text>
+      <View style={[styles.header, darkMode && { backgroundColor: '#232526', borderBottomColor: '#333' }]}>
+        <Text style={[styles.headerTitle, darkMode && { color: '#CAFF4E' }]}>oodis</Text>
         <TouchableOpacity onPress={() => navigation.navigate('Search')}>
           <Ionicons name="search" size={28} color="#27ae60" />
         </TouchableOpacity>
       </View>
 
+      {/* Profile + Composer Row */}
+      {renderProfileAndComposer()}
+
       {/* Filter Bar */}
-      <View style={styles.filterBar}>
+      <View style={[styles.filterBar, darkMode && { backgroundColor: '#232526', borderBottomColor: '#333' }]}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingHorizontal: 10 }}>
           {FILTERS.map(f => (
             <TouchableOpacity
@@ -349,6 +413,8 @@ export default function HomeScreen({ navigation }) {
               style={[
                 styles.filterBtn,
                 activeFilter === f.key && styles.filterBtnActive,
+                darkMode && { backgroundColor: '#181a1b' },
+                activeFilter === f.key && darkMode && { backgroundColor: '#CAFF4E' },
               ]}
               onPress={() => setActiveFilter(f.key)}
             >
@@ -356,6 +422,8 @@ export default function HomeScreen({ navigation }) {
               <Text style={[
                 styles.filterLabel,
                 activeFilter === f.key && styles.filterLabelActive,
+                darkMode && { color: '#fff' },
+                activeFilter === f.key && darkMode && { color: '#222' },
               ]}>
                 {f.label}
               </Text>
@@ -581,5 +649,35 @@ const styles = StyleSheet.create({
   },
   filterLabelActive: {
     color: '#222',
+  },
+  profileComposerRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    padding: 12,
+    backgroundColor: '#fff',
+  },
+  profileSummary: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    borderRadius: 18,
+    padding: 10,
+    marginRight: 10,
+    elevation: 2,
+    flex: 1.2,
+  },
+  profilePicLarge: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 12,
+    borderWidth: 2,
+    borderColor: '#27ae60',
+  },
+  profileNameLarge: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#27ae60',
   },
 });

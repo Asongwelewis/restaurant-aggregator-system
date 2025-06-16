@@ -52,7 +52,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: src/frontend
+        working-directory: RAS UI/RAS
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

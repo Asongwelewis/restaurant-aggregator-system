@@ -1,6 +1,10 @@
-import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, TouchableOpacity, Switch, ScrollView, TextInput, Alert, Modal, Pressable } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, Image, TouchableOpacity, Switch, ScrollView, TextInput, Alert, Modal, Pressable, ActivityIndicator } from 'react-native';
 import { Ionicons, MaterialIcons, FontAwesome } from '@expo/vector-icons';
+import { useTheme } from '../context/ThemeContext';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
+import { BASE_URL } from '../api/config';
 
 // For language support, you would use a library like i18n-js or react-i18next in a real app
 const LANGUAGES = [
@@ -10,20 +14,67 @@ const LANGUAGES = [
   { code: 'de', label: 'Deutsch' },
 ];
 
-export default function ProfileScreen() {
+export default function ProfileScreen(props) {
+  // Add fallback for useTheme
+  let themeContext;
+  try {
+    themeContext = useTheme();
+  } catch {
+    themeContext = {};
+  }
+  const darkMode = themeContext?.darkMode ?? false;
+  const setDarkMode = themeContext?.setDarkMode ?? (() => {});
+  const theme = darkMode ? darkStyles : styles;
+
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState('');
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [email, setEmail] = useState('guest@email.com');
-  const [username, setUsername] = useState('Guest');
   const [editing, setEditing] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
   const [phone, setPhone] = useState('');
   const [bio, setBio] = useState('');
   const [privateAccount, setPrivateAccount] = useState(false);
   const [language, setLanguage] = useState(LANGUAGES[0]);
   const [languageModal, setLanguageModal] = useState(false);
 
-  // Dynamic styles for dark mode
-  const theme = darkMode ? darkStyles : styles;
+  // Fetch user info from backend using stored token
+  useEffect(() => {
+    async function fetchUser() {
+      setLoading(true);
+      setFetchError('');
+      try {
+        const tokens = await AsyncStorage.getItem('authTokens');
+        if (!tokens) throw new Error('No authentication token found.');
+        // Parse tokens and get id_token (not access)
+        const parsedTokens = JSON.parse(tokens);
+        const idToken = parsedTokens.id_token || parsedTokens.idToken || parsedTokens.access || parsedTokens.token;
+        if (!idToken) throw new Error('No id_token found in stored tokens.');
+
+        console.log('idToken being sent:', idToken);
+
+        // Use the correct endpoint and header
+        const endpoint = '/auth/profile';
+        console.log('Trying endpoint:', `${BASE_URL}${endpoint}`);
+        const res = await axios.get(`${BASE_URL}${endpoint}`, {
+          headers: { 'id-token': idToken }
+        });
+
+        setUser(res.data);
+        setPhone(res.data.phone || '');
+        setBio(res.data.bio || '');
+      } catch (err) {
+        console.log('Profile fetch error:', err?.response?.data || err.message || err);
+        setFetchError(
+          err?.response?.data?.detail ||
+          err?.message ||
+          'Failed to load profile.'
+        );
+        setUser(null);
+      }
+      setLoading(false);
+    }
+    fetchUser();
+  }, []);
 
   const handleDeleteAccount = () => {
     Alert.alert(
@@ -56,12 +107,28 @@ export default function ProfileScreen() {
     Alert.alert("Language changed", `App language set to ${lang.label}`);
   };
 
+  if (loading) {
+    return (
+      <View style={[theme.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#27ae60" />
+      </View>
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <View style={[theme.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <Text style={{ color: 'red' }}>{fetchError}</Text>
+      </View>
+    );
+  }
+
   return (
     <ScrollView contentContainerStyle={theme.container}>
       {/* Profile Picture */}
       <TouchableOpacity style={theme.avatarContainer}>
         <Image
-          source={{ uri: 'https://randomuser.me/api/portraits/men/32.jpg' }}
+          source={{ uri: user?.profilePic || 'https://randomuser.me/api/portraits/men/32.jpg' }}
           style={theme.avatar}
         />
         <Text style={theme.changePhotoText}>Change Photo</Text>
@@ -73,26 +140,21 @@ export default function ProfileScreen() {
         {editing ? (
           <TextInput
             style={theme.input}
-            value={username}
-            onChangeText={setUsername}
-            placeholder="Username"
-            placeholderTextColor={darkMode ? "#aaa" : "#888"}
+            value={user?.username || ''}
+            editable={false}
           />
         ) : (
-          <Text style={theme.infoText}>{username}</Text>
+          <Text style={theme.infoText}>{user?.username || ''}</Text>
         )}
         <Text style={theme.label}>Email</Text>
         {editing ? (
           <TextInput
             style={theme.input}
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            placeholder="Email"
-            placeholderTextColor={darkMode ? "#aaa" : "#888"}
+            value={user?.email || ''}
+            editable={false}
           />
         ) : (
-          <Text style={theme.infoText}>{email}</Text>
+          <Text style={theme.infoText}>{user?.email || ''}</Text>
         )}
         <Text style={theme.label}>Phone</Text>
         {editing ? (
@@ -105,7 +167,7 @@ export default function ProfileScreen() {
             placeholderTextColor={darkMode ? "#aaa" : "#888"}
           />
         ) : (
-          <Text style={theme.infoText}>{phone || "Not set"}</Text>
+          <Text style={theme.infoText}>{user?.phone || "Not set"}</Text>
         )}
         <Text style={theme.label}>Bio</Text>
         {editing ? (
@@ -118,7 +180,7 @@ export default function ProfileScreen() {
             multiline
           />
         ) : (
-          <Text style={theme.infoText}>{bio || "No bio yet."}</Text>
+          <Text style={theme.infoText}>{user?.bio || "No bio yet."}</Text>
         )}
         <TouchableOpacity
           style={theme.editBtn}
