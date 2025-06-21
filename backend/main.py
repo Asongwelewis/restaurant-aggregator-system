@@ -1,12 +1,20 @@
 from fastapi import FastAPI
-from app.routers import restaurants, ratings, search  
+from app.routers import restaurants
 
-app = FastAPI()
+app = FastAPI(
+    title="Restaurant API",
+    description="API for managing restaurants - Development Mode (No Auth)",
+    version="1.0.0",
+    docs_url="/docs",
+    redoc_url=None
+)
 
-app.include_router(restaurants.router, prefix="/api/restaurants")
-app.include_router(ratings.router, prefix="/api/ratings")
-app.include_router(search.router, prefix="/api/search")
+app.include_router(
+    restaurants.router,
+    prefix="/restaurants",
+    tags=["restaurants"]
+)
 
 @app.get("/")
 def read_root():
-    return {"message": "welcome to odis the best app for your food "}
+    return {"message": "Restaurant API - Running in development mode (no authentication)"}
