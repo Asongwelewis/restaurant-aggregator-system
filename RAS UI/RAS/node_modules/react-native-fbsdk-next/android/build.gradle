@@ -1,0 +1,57 @@
+def safeExtGet(prop, fallback) {
+    rootProject.ext.has(prop) ? rootProject.ext.get(prop) : fallback
+}
+
+buildscript {
+    // The Android Gradle plugin is only required when opening the android folder stand-alone.
+    // This avoids unnecessary downloads and potential conflicts when the library is included as a
+    // module dependency in an application project.
+    if (project == rootProject) {
+        repositories {
+            mavenCentral()
+            google()
+        }
+        dependencies {
+            classpath 'com.android.tools.build:gradle:8.3.2'
+        }
+    }
+}
+
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion safeExtGet('compileSdkVersion', 34)
+    defaultConfig {
+        minSdkVersion safeExtGet('minSdkVersion', 16)
+        targetSdkVersion safeExtGet('targetSdkVersion', 34)
+    }
+    lintOptions {
+        abortOnError false
+    }
+    def agpVersion = com.android.Version.ANDROID_GRADLE_PLUGIN_VERSION
+    if (agpVersion.tokenize('.')[0].toInteger() >= 7) {
+        namespace "com.facebook.reactnative.androidsdk"
+    }
+}
+
+repositories {
+    mavenLocal()
+    maven {
+        // All of React Native (JS, Obj-C sources, Android binaries) is installed from npm
+        url "$rootDir/../node_modules/react-native/android"
+    }
+    maven {
+        // Android JSC is installed from npm
+        url "$rootDir/../node_modules/jsc-android/dist"
+    }
+    mavenCentral()
+    google()
+}
+
+def FACEBOOK_SDK_VERSION = safeExtGet('facebookSdkVersion', '18.+')
+
+dependencies {
+    //noinspection GradleDynamicVersion
+    implementation "com.facebook.react:react-native:+"  // From node_modules
+    implementation "com.facebook.android:facebook-android-sdk:${FACEBOOK_SDK_VERSION}"
+}
